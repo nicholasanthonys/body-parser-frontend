@@ -67,7 +67,7 @@
 
 <script>
 import {ValidationObserver, ValidationProvider} from "vee-validate";
-import Cookie from 'js-cookie';
+
 export default {
   components: {
     ValidationObserver: ValidationObserver,
@@ -120,7 +120,6 @@ export default {
         })
 
 
-
       } catch (e) {
 
       }
@@ -128,10 +127,19 @@ export default {
     async register() {
       try {
 
+        await this.$axios.post('/auth/register', {
+          username: this.username,
+          email: this.email,
+          password: this.password
+        })
 
-
-
-
+        //* Automatic Log in
+        await this.$auth.loginWith('local', {
+          data: {
+            email: this.email,
+            password: this.password
+          }
+        })
       } catch (e) {
 
       }
