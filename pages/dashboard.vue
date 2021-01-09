@@ -8,7 +8,7 @@
       <div class="navbar-brand">
         <a
           class="navbar-item"
-          href="/"
+          href="/static"
         >
           <img
             src="~assets/buefy.png"
@@ -39,35 +39,48 @@
               :to="item.to"
               exact-active-class="is-active"
             >
+
               <b-icon :icon="item.icon" /> {{ item.title }}
             </nuxt-link>
           </li>
         </ul>
+        <ul>
+          <b-button @click="logOut">Log out</b-button>
+        </ul>
       </aside>
 
       <div class="container column is-10">
-        <nuxt />
+        <Nuxt/>
       </div>
+
     </section>
   </div>
 </template>
 
 <script>
 export default {
+
   data () {
     return {
       items: [
         {
           title: 'Home',
           icon: 'home',
-          to: { name: 'index' }
+          to: { name: 'dashboard' }
         },
         {
           title: 'Inspire',
           icon: 'lightbulb',
-          to: { name: 'inspire' }
+          to: { name: 'dashboard-inspire' }
         }
       ]
+    }
+  },
+  methods : {
+   async logOut(){
+     console.log("logout triggered");
+     console.log(this.$auth);
+      await this.$auth.logout()
     }
   }
 }

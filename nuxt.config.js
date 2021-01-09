@@ -14,10 +14,13 @@ export default {
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [
+    // SCSS file in the project
+    '@/assets/css/main.scss'
   ],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
+    "~/plugins/vee-validate.js"
   ],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
@@ -31,9 +34,18 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/buefy
     'nuxt-buefy',
+    '@nuxtjs/axios',
+    '@nuxtjs/auth-next'
   ],
+
+  axios: {
+    baseURL: 'http://127.0.0.1:3333/api/v1'
+  },
+
+
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
+    transpile: ["vee-validate/dist/rules"],
   }
 }
