@@ -84,8 +84,8 @@ export default {
   data() {
     return {
       username: null,
-      email: null,
-      password: null,
+      email: "test123@mailinator.com",
+      password: "nicho1234",
       confirmPassword: null,
     }
   },
@@ -100,18 +100,24 @@ export default {
         this.$refs.observer.reset();
       });
     },
-    onSubmit() {
+    async onSubmit() {
       // Login
       if (this.mode === "login") {
-        this.login();
+        await this.login();
       } else {
         // Register
-        this.register();
+        await this.register();
       }
     },
     async login() {
       try {
 
+        await this.$auth.loginWith('local', {
+          data: {
+            email: this.email,
+            password: this.password
+          }
+        })
 
 
 

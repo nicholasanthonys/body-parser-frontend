@@ -78,8 +78,7 @@ export default {
   },
   methods : {
    async logOut(){
-     console.log("logout triggered");
-     console.log(this.$auth);
+
       await this.$auth.logout()
     }
   }
