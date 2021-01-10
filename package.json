@@ -16,7 +16,8 @@
     "js-cookie": "^2.2.1",
     "nuxt": "^2.14.6",
     "nuxt-buefy": "^0.4.3",
-    "vee-validate": "^3.4.5"
+    "vee-validate": "^3.4.5",
+    "vue-codemirror": "^4.0.6"
   },
   "devDependencies": {
     "fibers": "^5.0.0",

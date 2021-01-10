@@ -64,13 +64,13 @@ export default {
     return {
       items: [
         {
-          title: 'Home',
-          icon: 'home',
+          title: 'Projects',
+          icon: 'folder',
           to: { name: 'dashboard' }
         },
         {
           title: 'Containers',
-          icon: 'lightbulb',
+          icon: 'cube',
           to: { name: 'dashboard-containers' }
         }
       ]

@@ -13,8 +13,6 @@ export const actions = {
       this.$axios.get('/projects/all')
         .then(response => {
           if (response.status === 200) {
-            console.log("response data is");
-            console.log(response.data);
             context.commit("setProjects",response.data)
           }
         })

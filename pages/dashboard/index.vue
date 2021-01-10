@@ -1,52 +1,37 @@
 <template>
   <section class="section">
-    <div class="columns">
-      <card
-        title="Free"
-        icon="github"
-      >
-        Open source on <a href="https://github.com/buefy/buefy">
-        GitHub
-      </a>
-      </card>
+    <div class="columns is-multiline" v-if="projects.length > 0">
+      <div class="column is-4" v-for="project in projects" :key="project.id">
+        <card
+          :title="project.project_name"
+          icon="github"
 
-      <card
-        title="Responsive"
-        icon="cellphone-link"
-      >
-        <b class="has-text-grey">
-          Every
-        </b> component is responsive
-      </card>
+        >
+          <template v-slot:card-content v-if="project.project_description">
+            {{ project.project_description }}
+          </template>
+          <template v-slot:card-content v-else>
+            No project description provided
+          </template>
 
-      <card
-        title="Modern"
-        icon="alert-decagram"
-      >
-        Built with <a href="https://vuejs.org/">
-        Vue.js
-      </a> and <a href="http://bulma.io/">
-        Bulma
-      </a>
-      </card>
-
-      <card
-        title="Lightweight"
-        icon="arrange-bring-to-front"
-      >
-        No other internal dependency
-      </card>
-
+          <template v-slot:card-footer-content>
+            <a href="#" class="card-footer-item">Save</a>
+            <a href="#" class="card-footer-item">Edit</a>
+            <a href="#" class="card-footer-item">Delete</a>
+          </template>
+        </card>
+      </div>
 
     </div>
-    projects is {{ projects }}
-<!--    <b-button @click="increment">Increment counter</b-button>-->
+
+    <!--    <b-button @click="increment">Increment counter</b-button>-->
   </section>
 </template>
 
 <script>
 import Card from '~/components/Card'
-import {mapActions, mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters} from "vuex";
+import {showToast} from "~/services/utils";
 
 
 export default {
@@ -56,16 +41,28 @@ export default {
   },
   computed: {
     ...mapGetters({
-      projects : 'projects/getProjects'
+      projects: 'projects/getProjects'
     })
+  },
+  data() {
+    return {
+      isLoading: false,
+    }
   },
   methods: {
     ...mapActions({
-      getProjects : "projects/fetchProjects"
+      getProjects: "projects/fetchProjects"
     })
   },
-  created() {
-    this.getProjects();
+  async created() {
+
+    try {
+      this.isLoading = true;
+      await this.getProjects();
+    } catch (err) {
+      showToast(err.response.data.message, 'is-danger', 'is-bottom')
+    }
+    this.isLoading = false;
   }
 }
 </script>
