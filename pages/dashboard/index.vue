@@ -1,30 +1,48 @@
 <template>
   <section class="section">
-    <div class="columns is-multiline" v-if="projects.length > 0">
-      <div class="column is-4" v-for="project in projects" :key="project.id">
+    <masonry
+      :cols="{default: 4, 1000: 3, 700: 1, 400: 1}"
+      :gutter="{default: '30px', 700: '15px'}"
+    >
+      <div v-for="project in projects" :key="project.id" style="padding: 10px">
         <card
-          :title="project.project_name"
-          icon="github"
-
+          :title="project.projectName"
+          icon="folder"
         >
-          <template v-slot:card-content v-if="project.project_description">
-            {{ project.project_description }}
+          <template v-slot:card-content v-if="project.projectDescription">
+            {{ project.projectDescription }}
           </template>
           <template v-slot:card-content v-else>
             No project description provided
           </template>
-
           <template v-slot:card-footer-content>
-            <a href="#" class="card-footer-item">Save</a>
-            <a href="#" class="card-footer-item">Edit</a>
-            <a href="#" class="card-footer-item">Delete</a>
+            <a  class="card-footer-item">
+
+              <b-icon
+
+                icon="pencil"
+                size="is-small"
+              >
+              </b-icon>
+            </a>
+            <a @click="deleteProject"  class="card-footer-item">
+
+              <b-icon
+
+                icon="delete"
+                size="is-small"
+              >
+              </b-icon>
+            </a>
           </template>
         </card>
+
+
       </div>
+    </masonry>
 
-    </div>
 
-    <!--    <b-button @click="increment">Increment counter</b-button>-->
+
   </section>
 </template>
 
@@ -52,8 +70,23 @@ export default {
   methods: {
     ...mapActions({
       getProjects: "projects/fetchProjects"
-    })
+    }),
+    deleteProject(){
+      console.log("delete project triggered")
+    }
   },
+  // mounted() {
+  //   console.log("mounted triggered")
+  //   var grid = document.querySelector('.grid');
+  //   console.log("grid is");
+  //   console.log(grid);
+  //   var msnry = new Masonry( grid, {
+  //     // options...
+  //     itemSelector: '.grid-item',
+  //     columnWidth: 200
+  //
+  //   });
+  // },
   async created() {
 
     try {
@@ -63,6 +96,17 @@ export default {
       showToast(err.response.data.message, 'is-danger', 'is-bottom')
     }
     this.isLoading = false;
+
+
   }
 }
 </script>
+
+<style lang="scss" scoped>
+//.grid-item {
+//  width: 200px;
+//  img{
+//    width: 100%;
+//  }
+//}
+</style>

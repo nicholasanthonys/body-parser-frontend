@@ -17,7 +17,8 @@
     "nuxt": "^2.14.6",
     "nuxt-buefy": "^0.4.3",
     "vee-validate": "^3.4.5",
-    "vue-codemirror": "^4.0.6"
+    "vue-codemirror": "^4.0.6",
+    "vue-masonry-css": "^1.0.3"
   },
   "devDependencies": {
     "fibers": "^5.0.0",
