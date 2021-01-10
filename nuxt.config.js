@@ -55,8 +55,8 @@ export default {
       local: {
         token: {
           property: 'token',
-          // required: true,
-          // type: 'Bearer'
+          required: true,
+          type: 'Bearer'
         },
         user: {
           property: 'user',
