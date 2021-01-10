@@ -69,9 +69,9 @@ export default {
           to: { name: 'dashboard' }
         },
         {
-          title: 'Inspire',
+          title: 'Containers',
           icon: 'lightbulb',
-          to: { name: 'dashboard-inspire' }
+          to: { name: 'dashboard-containers' }
         }
       ]
     }

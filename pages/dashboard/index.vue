@@ -1,13 +1,13 @@
 <template>
   <section class="section">
-    <div class="columns is-mobile">
+    <div class="columns">
       <card
         title="Free"
         icon="github"
       >
         Open source on <a href="https://github.com/buefy/buefy">
-          GitHub
-        </a>
+        GitHub
+      </a>
       </card>
 
       <card
@@ -24,10 +24,10 @@
         icon="alert-decagram"
       >
         Built with <a href="https://vuejs.org/">
-          Vue.js
-        </a> and <a href="http://bulma.io/">
-          Bulma
-        </a>
+        Vue.js
+      </a> and <a href="http://bulma.io/">
+        Bulma
+      </a>
       </card>
 
       <card
@@ -36,18 +36,36 @@
       >
         No other internal dependency
       </card>
+
+
     </div>
+    projects is {{ projects }}
+<!--    <b-button @click="increment">Increment counter</b-button>-->
   </section>
 </template>
 
 <script>
 import Card from '~/components/Card'
+import {mapActions, mapGetters, mapMutations} from "vuex";
+
 
 export default {
   name: 'HomePage',
-
   components: {
     Card
+  },
+  computed: {
+    ...mapGetters({
+      projects : 'projects/getProjects'
+    })
+  },
+  methods: {
+    ...mapActions({
+      getProjects : "projects/fetchProjects"
+    })
+  },
+  created() {
+    this.getProjects();
   }
 }
 </script>
