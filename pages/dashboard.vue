@@ -1,7 +1,5 @@
 <template>
   <div>
-
-
     <section class="main-content columns">
       <aside class="column is-2 section">
         <p class="menu-label is-hidden-touch">
