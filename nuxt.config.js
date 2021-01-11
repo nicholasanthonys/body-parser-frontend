@@ -18,13 +18,19 @@ export default {
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [
     // SCSS file in the project
-    '@/assets/css/main.scss'
+    '@/assets/css/main.scss',
+
   ],
+  purgeCSS: {
+    whitelistPatternsChildren: [/token$/]
+},
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
     "~/plugins/vee-validate.js",
-    "~/plugins/vue-masonry.js"
+    "~/plugins/vue-masonry.js",
+    '~/plugins/json-edit.js',
+
   ],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
