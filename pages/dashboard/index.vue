@@ -16,7 +16,7 @@
             No project description provided
           </template>
           <template v-slot:card-footer-content>
-            <a  class="card-footer-item">
+            <nuxt-link :to="`/projects/${project.projectName}`"  class="card-footer-item">
 
               <b-icon
 
@@ -24,7 +24,7 @@
                 size="is-small"
               >
               </b-icon>
-            </a>
+            </nuxt-link>
             <a @click="deleteProject"  class="card-footer-item">
 
               <b-icon
