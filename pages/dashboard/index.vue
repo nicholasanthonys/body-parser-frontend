@@ -1,8 +1,14 @@
 <template>
   <section class="section">
+    <div v-if="isLoading">
+      <b-loading :is-full-page="isFullPageLoading" :active="isLoading"  ></b-loading>
+    </div>
+
+
     <masonry
       :cols="{default: 4, 1000: 3, 700: 1, 400: 1}"
       :gutter="{default: '30px', 700: '15px'}"
+      v-else
     >
       <div v-for="project in projects" :key="project.id" style="padding: 10px">
         <card
@@ -17,7 +23,7 @@
             No project description provided
           </template>
           <template v-slot:card-footer-content>
-            <nuxt-link :to="`/projects/${project.projectSlug}`"  class="card-footer-item">
+            <nuxt-link :to="`/projects/${project.projectSlug}`" class="card-footer-item">
 
               <b-icon
 
@@ -26,7 +32,7 @@
               >
               </b-icon>
             </nuxt-link>
-            <a @click="deleteProject"  class="card-footer-item">
+            <a @click="deleteProject" class="card-footer-item">
 
               <b-icon
 
@@ -41,7 +47,6 @@
 
       </div>
     </masonry>
-
 
 
   </section>
@@ -66,37 +71,33 @@ export default {
   data() {
     return {
       isLoading: false,
+      isFullPageLoading: false,
     }
   },
   methods: {
     ...mapActions({
       getProjects: "projects/fetchProjects"
     }),
-    deleteProject(){
+    deleteProject() {
       console.log("delete project triggered")
+    },
+    async loadProjects() {
+      console.log("load projects triggered");
+      try {
+        this.isLoading = true;
+        await this.getProjects();
+        this.isLoading = false;
+      } catch (err) {
+        showToast(err.response.data.message, 'is-danger', 'is-bottom')
+      }
+      this.isLoading = false;
+
     }
   },
-  // mounted() {
-  //   console.log("mounted triggered")
-  //   var grid = document.querySelector('.grid');
-  //   console.log("grid is");
-  //   console.log(grid);
-  //   var msnry = new Masonry( grid, {
-  //     // options...
-  //     itemSelector: '.grid-item',
-  //     columnWidth: 200
-  //
-  //   });
-  // },
+
   async created() {
 
-    try {
-      this.isLoading = true;
-      await this.getProjects();
-    } catch (err) {
-      showToast(err.response.data.message, 'is-danger', 'is-bottom')
-    }
-    this.isLoading = false;
+    await this.loadProjects()
 
 
   }
