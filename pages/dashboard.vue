@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <section class="main-content columns">
+
+    <section class="main-content columns" style="margin-top: 4px">
       <aside class="column is-2 section">
         <p class="menu-label is-hidden-touch">
           General
@@ -29,7 +29,7 @@
       </div>
 
     </section>
-  </div>
+
 </template>
 
 <script>
