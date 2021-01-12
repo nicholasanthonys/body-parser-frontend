@@ -10,13 +10,14 @@
           icon="folder"
         >
           <template v-slot:card-content v-if="project.projectDescription">
-            {{ project.projectDescription }}
+            <p>Project Slug : {{ project.projectSlug }}</p>
+            <p>{{ project.projectDescription }}</p>
           </template>
           <template v-slot:card-content v-else>
             No project description provided
           </template>
           <template v-slot:card-footer-content>
-            <nuxt-link :to="`/projects/${project.projectName}`"  class="card-footer-item">
+            <nuxt-link :to="`/projects/${project.projectSlug}`"  class="card-footer-item">
 
               <b-icon
 
