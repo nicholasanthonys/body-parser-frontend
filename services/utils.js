@@ -12,3 +12,5 @@ export const showToast = function (message, type, position) {
     position: position != null ? position : 'is-top',
   })
 }
+
+

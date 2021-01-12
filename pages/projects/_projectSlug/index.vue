@@ -29,7 +29,9 @@
           <b-table-column label="Edit" v-slot="props">
 
             <div class="buttons">
-              <b-button type="is-info" size="is-small" icon-left="pencil">Edit</b-button>
+              <b-button type="is-info" size="is-small" icon-left="pencil"
+                        @click="$router.push(`${$route.params.projectSlug}/configures/${props.row.replace('.json','')}`)">Edit
+              </b-button>
 
             </div>
           </b-table-column>
@@ -63,6 +65,7 @@
 
 <script>
 import {showToast} from "@/services/utils";
+import {mapActions} from "vuex";
 
 export default {
   layout: 'nav',
@@ -84,13 +87,16 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      getProjectBySlug : 'projects/fetchProjectBySlug'
+    }),
     /*
 * Load async data
 */async loadAsyncData() {
 
       try {
         this.loading = true;
-        let response = await this.$axios.get(`/projects/${this.$route.params.projectSlug}`);
+        let response = await this.getProjectBySlug(this.$route.params.projectSlug);
         this.data = response.data;
         console.log("response data is");
         console.log(response.data);

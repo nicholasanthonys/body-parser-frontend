@@ -4,9 +4,10 @@
       <v-jsoneditor
         v-model="code"
         :plus="false"
-        height="400px"
+
         @error="onError"
         :options="options"
+
       />
     </div>
 
@@ -25,7 +26,7 @@
 <script>
 import VJsoneditor from "v-jsoneditor";
 import { PrismEditor } from "vue-prism-editor";
-import "vue-prism-editor/dist/prismeditor.min.css"; // import the styles 
+import "vue-prism-editor/dist/prismeditor.min.css"; // import the styles
 
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-json";
@@ -37,11 +38,14 @@ export default {
   components: {
     VJsoneditor,
     PrismEditor,
-
+  },
+  props : {
+    propCode : Object
   },
   watch: {
-    code(val) {
-      this.jsonString = JSON.stringify({...this.code},null, "\t");
+    code(newVal) {
+      this.jsonString = JSON.stringify({...newVal},null, "\t");
+      this.$emit('on-change-code', newVal);
     },
   },
   data() {
@@ -54,7 +58,7 @@ export default {
        options: {
         mode: MODE,
         onEditable: function (node) {
-          console.log("node", node);
+          // console.log("node")
           return true;
         },
         theme: "ace/theme/tomorrow_night_bright",
@@ -63,14 +67,16 @@ export default {
     };
   },
   methods: {
-    onError() {
-      console.log("error");
+    onError(err) {
+      console.log("error with editor")
+      console.log(err);
     },
     highlighter(code) {
       return highlight(code, languages.json); // languages.<insert language> to return html with markup
     },
   },
   created() {
+    this.code = {...this.propCode};
     this.jsonString = JSON.stringify(this.code,null, "\t");
   },
 
@@ -78,6 +84,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$editorHeight : 400px;
 .my-editor {
   /* we dont use `language-` classes anymore so thats why we need to add background and text color manually */
   background: #2d2d2d;
@@ -93,5 +100,46 @@ export default {
 /* optional class for removing the outline */
 .prism-editor__textarea:focus {
   outline: none;
+}
+
+.jsoneditor-container.min-box {
+  height: $editorHeight;
+}
+
+div.prism-editor-wrapper {
+  height: $editorHeight;
+  overflow-y: auto;
+  div.prism-editor__container{
+    .prism-editor__editor{
+      .number{
+      background-color: red !important;
+      }
+    }
+  }
+
+}
+
+
+
+</style>
+
+<style lang="scss">
+div.prism-editor-wrapper {
+  div.prism-editor__container {
+    .prism-editor__editor {
+      .number {
+        background-color: transparent;
+        padding: 0px;
+        font-size: inherit;
+        height: 0;
+        vertical-align: inherit;
+        justify-content: inherit;
+        margin-right: 0;
+        min-width: 0;
+        text-align: left;
+
+      }
+    }
+  }
 }
 </style>
