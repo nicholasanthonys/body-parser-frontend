@@ -82,15 +82,15 @@ export default {
       console.log("delete project triggered")
     },
     async loadProjects() {
-      console.log("load projects triggered");
-      try {
-        this.isLoading = true;
-        await this.getProjects();
-        this.isLoading = false;
-      } catch (err) {
-        showToast(err.response.data.message, 'is-danger', 'is-bottom')
-      }
-      this.isLoading = false;
+      // console.log("load projects triggered");
+      // try {
+      //   this.isLoading = true;
+      //   await this.getProjects();
+      //   this.isLoading = false;
+      // } catch (err) {
+      //   showToast(err.response.data.message, 'is-danger', 'is-bottom')
+      // }
+      // this.isLoading = false;
 
     }
   },

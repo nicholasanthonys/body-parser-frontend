@@ -1,7 +1,10 @@
 export default {
 // Disable Server Side rendering
   ssr: false,
-
+  server: {
+    port: 8000, // default: 3000
+    host: '0.0.0.0' // default: localhost
+  },
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
     title: 'body-parser-frontend',
@@ -23,7 +26,7 @@ export default {
   ],
   purgeCSS: {
     whitelistPatternsChildren: [/token$/]
-},
+  },
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
@@ -48,7 +51,7 @@ export default {
   ],
 
   axios: {
-    baseURL: 'http://127.0.0.1:3333/api/v1'
+    baseURL: 'http://127.0.0.1:3000/api/v1'
   },
   router: {
     middleware: ['auth']
@@ -62,10 +65,17 @@ export default {
     },
     strategies: {
       local: {
+        scheme: 'refresh',
         token: {
-          property: 'token',
+          property: 'accessToken',
           required: true,
+          maxAge: 10,
           type: 'Bearer'
+        },
+        refreshToken: {
+          property: 'refreshToken',
+          data: 'refreshToken',
+          maxAge: 60 * 60 * 24 * 30
         },
         user: {
           property: 'user',
@@ -73,8 +83,9 @@ export default {
         },
         endpoints: {
           login: {url: '/auth/login', method: 'post', propertyName: 'token'},
-          // logout: { url: '/api/auth/logout', method: 'post' },
-          user: {url: '/user/show', method: 'get', propertyName: 'user'}
+          refresh: {url: '/auth/refresh', method: 'post'},
+          logout: {url: '/auth/logout', method: 'delete'},
+          user: {url: '/user', method: 'get', propertyName: 'user'}
         }
       }
     }

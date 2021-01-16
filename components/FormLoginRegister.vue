@@ -5,7 +5,7 @@
     <ValidationObserver v-slot="{handleSubmit}" ref="observer">
       <form @submit.prevent="handleSubmit(onSubmit)">
         <ValidationProvider v-slot="{ errors }"
-                            name="Username"
+                            name="Name"
                             rules="required|min:5"
                             v-if="mode==='register'"
         >
@@ -15,7 +15,7 @@
                    :type="{ 'is-danger': errors.length > 0 }"
                    :message="  errors.length > 0 ? errors[0] : '' "
           >
-            <b-input maxlength="30" v-model="username" key="username-input"></b-input>
+            <b-input maxlength="30" v-model="name" key="name-input"></b-input>
           </b-field>
 
 
@@ -83,7 +83,7 @@ export default {
   },
   data() {
     return {
-      username: null,
+      name: null,
       email: "test123@mailinator.com",
       password: "nicho1234",
       confirmPassword: null,
@@ -91,7 +91,7 @@ export default {
   },
   methods: {
     resetForm() {
-      this.username = null
+      this.name = null
       this.email = null
       this.password = null
       this.confirmPassword = null
@@ -128,7 +128,7 @@ export default {
       try {
 
         await this.$axios.post('/auth/register', {
-          username: this.username,
+          name: this.name,
           email: this.email,
           password: this.password
         })
