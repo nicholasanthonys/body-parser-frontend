@@ -1,6 +1,11 @@
 <template>
   <section class="section">
-    <p class="is-size-2">Project Detail</p>
+    <p class="is-size-2">Project Detail
+      <b-button
+        @click="isComponentModalActive = true"
+        type="is-primary"
+        icon-left="pencil"/>
+    </p>
     <div class="container" v-if="loading">
       <div>
         <b-skeleton :animated="skeletonAnimated"></b-skeleton>
@@ -43,6 +48,21 @@
         </b-table>
       </div>
 
+
+      <b-modal
+        v-model="isComponentModalActive"
+        has-modal-card
+        trap-focus
+        :destroy-on-hide="false"
+        aria-role="dialog"
+        aria-label="Example Modal"
+
+        aria-modal>
+
+        <template #default="props">
+          <FormEditProject :project-prop="data.project" v-on:close="isComponentModalActive = false" v-if="isComponentModalActive"/>
+        </template>
+      </b-modal>
     </div>
 
     <div class="container">
@@ -59,16 +79,26 @@
         <b-button type="is-info" icon-left="pencil">Edit Response</b-button>
       </div>
     </div>
-
   </section>
 </template>
 
 <script>
 import {showToast} from "@/services/utils";
 import {mapActions} from "vuex";
+import FormEditProject from "@/components/FormEditProject";
+
 
 export default {
+  components: {FormEditProject},
   layout: 'nav',
+  watch: {
+    isComponentModalActive(newVal) {
+      if (newVal) {
+        this.form.name = this.data.project.name;
+        this.form.description = this.data.project.description;
+      }
+    }
+  },
   data() {
     return {
       data: {
@@ -76,6 +106,11 @@ export default {
         configures: [],
         response: null
       },
+      form: {
+        name: null,
+        description: null
+      },
+      isComponentModalActive: false,
       skeletonAnimated: true,
       // total: 0,
       loading: false,
@@ -88,7 +123,7 @@ export default {
   },
   methods: {
     ...mapActions({
-      getProjectBySlug : 'projects/fetchProjectBySlug'
+      getProjectBySlug: 'projects/fetchProjectBySlug'
     }),
     /*
 * Load async data
