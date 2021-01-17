@@ -70,8 +70,8 @@ import {ValidationObserver, ValidationProvider} from "vee-validate";
 
 export default {
   components: {
-    ValidationObserver: ValidationObserver,
-    ValidationProvider: ValidationProvider
+    ValidationObserver,
+    ValidationProvider
   },
   props: {
     mode: String
