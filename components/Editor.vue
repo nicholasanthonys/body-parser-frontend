@@ -1,5 +1,18 @@
 <template>
-  <div class="columns">
+  <div class="columns is-multiline">
+    <div class="column is-12" >
+      <b-switch v-model="isRightEditorEditable">
+        Editable in the right editor
+      </b-switch>
+      <b-notification v-if="error"
+          type="is-danger"
+          aria-close-label="Close notification"
+          role="alert" :closable="false">
+        Error in the right Editor
+        <p>   {{error}}</p>
+      </b-notification>
+
+    </div>
     <div class="column is-6">
       <v-jsoneditor
         v-model="code"
@@ -17,7 +30,7 @@
         v-model="jsonString"
         :highlight="highlighter"
         line-numbers
-        readonly
+        :readonly="!isRightEditorEditable"
         :tabsize="4"
       ></prism-editor>
     </div>
@@ -30,7 +43,8 @@ import "vue-prism-editor/dist/prismeditor.min.css"; // import the styles
 
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-json";
-import "prismjs/themes/prism-tomorrow.css"; // import syntax highlighti
+import "prismjs/themes/prism-tomorrow.css";
+import {showToast} from "@/services/utils"; // import syntax highlighti
 
 const MODE = null
 export default {
@@ -47,10 +61,27 @@ export default {
       this.jsonString = JSON.stringify({...newVal},null, "\t");
       this.$emit('on-change-code', newVal);
     },
+    jsonString(newVal){
+      try{
+        this.code = JSON.parse(newVal)
+        this.error = null;
+      }catch (err) {
+        this.error = err.toString()
+      }
+    },
+    isRightEditorEditable(newVal){
+      if(newVal){
+        showToast('Right Editor is editable', 'is-primary','is-bottom')
+      }else{
+        showToast('Right Editor is read only', 'is-primary','is-bottom')
+      }
+    },
   },
   data() {
     return {
+      error: null,
       jsonString: null,
+      isRightEditorEditable : false,
       lang: "json",
       code: {
         hello: "vue",

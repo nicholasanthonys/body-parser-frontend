@@ -14,8 +14,9 @@ export const getters = {
 export const actions = {
   async fetchProjects(context) {
     return new Promise(((resolve, reject) => {
-      this.$axios.get('/projects/all')
+      this.$axios.get('/project')
         .then(response => {
+
           if (response.status === 200) {
             context.commit("setProjects", response.data)
           }
@@ -23,9 +24,10 @@ export const actions = {
         }).catch(error => reject(error));
     }))
   },
+  // Get project detail
   async fetchProjectBySlug(context,projectSlug){
     return new Promise(((resolve, reject) => {
-      this.$axios.get(`/projects/${projectSlug}`)
+      this.$axios.get(`/project/${projectSlug}`)
         .then(response => {
           if (response.status === 200) {
             context.commit("setSelectedProject", response.data)

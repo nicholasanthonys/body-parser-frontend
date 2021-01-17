@@ -14,23 +14,23 @@
     </div>
     <div class="container" v-else>
       <p class="title">
-        {{ data.project.projectName }}
+        {{ data.project.name }}
       </p>
-      <p class="subtitle">{{ data.project.projectDescription }}</p>
+      <p class="subtitle">{{ data.project.description }}</p>
       <div>
         <b-table
           :data="data.configures"
           :loading="loading">
 
           <b-table-column label="Configure Name" v-slot="props">
-            {{ props.row }}
+            Configure-{{ props.index }}
           </b-table-column>
 
           <b-table-column label="Edit" v-slot="props">
 
             <div class="buttons">
               <b-button type="is-info" size="is-small" icon-left="pencil"
-                        @click="$router.push(`${$route.params.projectSlug}/configures/${props.row.replace('.json','')}`)">Edit
+                        @click="$router.push(`${$route.params.projectSlug}/configures/${props.row._id}`)">Edit
               </b-button>
 
             </div>

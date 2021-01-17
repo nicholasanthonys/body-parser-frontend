@@ -7,10 +7,12 @@
     <div class="container" v-else>
       <div class="header" style="margin:20px 0px">
         <p class="title">Configuration Description</p>
-        <p class="subtitle">{{description}}</p>
+
+          <b-input v-model="configure.description"  type="textarea"></b-input>
+
       </div>
 
-      <Editor :prop-code="configure" v-on:on-change-code="onChangeCode"/>
+      <Editor :prop-code="configure.config" v-on:on-change-code="onChangeCode"/>
     </div>
   </section>
 </template>
@@ -26,29 +28,33 @@ export default {
   data(){
     return{
       isLoading : false,
-
-        configure : {},
-
-
+        configure : {
+          _id : null,
+          projectId : null,
+          config : null,
+          description : null,
+        },
       description : null,
     }
   },
   methods : {
     onChangeCode(val){
 
-      this.configure = val;
+      this.configure.config = val;
 
       console.log(this.configure)
     },
     async loadConfigure(){
-      const {projectSlug,configureName} = this.$route.params
-      // console.log("projectSlug is");
-      // console.log(projectSlug);
-      // console.log("configure Name is")
-      // console.log(configureName);
+      const {projectSlug,configureId} = this.$route.params
+
       this.isLoading = true;
       try{
-        let res = await this.$axios.get(`/projects/${projectSlug}/configures/${configureName}`)
+        let res = await this.$axios.get(`/configure`,{
+          params : {
+            projectSlug,
+            configureId
+          }
+        })
         const {configure,description} = res.data;
 
 
