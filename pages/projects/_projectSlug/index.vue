@@ -2,6 +2,7 @@
   <section class="section">
     <p class="is-size-2">Project Detail
       <b-button
+        v-if="data.project != null"
         @click="isComponentModalActive = true"
         type="is-primary"
         icon-left="pencil"/>
@@ -18,11 +19,15 @@
       </div>
     </div>
     <div class="container" v-else>
-      <p class="title">
-        {{ data.project.name }}
-      </p>
-      <p class="subtitle">{{ data.project.description }}</p>
-      <div>
+      <div v-if="data.project != null">
+        <p class="title">
+          {{ data.project.name }}
+        </p>
+        <p class="subtitle">{{ data.project.description }}</p>
+      </div>
+    </div>
+
+      <div class="container" v-if="data.configures.length >0">
         <b-table
           :data="data.configures"
           :loading="loading">
@@ -47,6 +52,9 @@
 
         </b-table>
       </div>
+      <div v-if="data.configures.length === 0">
+        <p class="has-text-2"> No Configures Provided</p>
+      </div>
 
 
       <b-modal
@@ -60,10 +68,11 @@
         aria-modal>
 
         <template #default="props">
-          <FormEditProject :project-prop="data.project" v-on:close="isComponentModalActive = false" v-if="isComponentModalActive"/>
+          <FormEditProject :project-prop="data.project" v-on:close="isComponentModalActive = false"
+                           v-if="isComponentModalActive"/>
         </template>
       </b-modal>
-    </div>
+
 
     <div class="container">
       <div v-if="!data.response">
@@ -73,10 +82,12 @@
         <b-button type="is-primary" icon-left="plus">Add Response</b-button>
       </div>
       <div v-else>
-        <p class="is-size-5">
+        <p class="is-size-5" v-if="data.response != null">
           Edit response.json here
         </p>
-        <b-button type="is-info" icon-left="pencil">Edit Response</b-button>
+        <b-button type="is-info" icon-left="pencil" v-if="data.response != null && data.configures.length > 0">Edit
+          Response
+        </b-button>
       </div>
     </div>
   </section>
