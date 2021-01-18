@@ -31,7 +31,7 @@
         :highlight="highlighter"
         line-numbers
         :readonly="!isRightEditorEditable"
-        :tabsize="4"
+        :tab-size="4"
       ></prism-editor>
     </div>
   </div>
