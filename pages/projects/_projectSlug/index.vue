@@ -2,7 +2,7 @@
   <section class="section">
     <p class="is-size-2">Project Detail
       <b-button
-        v-if="data.project != null"
+        v-if="selectedProject != null"
         @click="isComponentModalActive = true"
         type="is-primary"
         icon-left="pencil"/>
@@ -19,17 +19,17 @@
       </div>
     </div>
     <div class="container" v-else>
-      <div v-if="data.project != null">
+      <div v-if="selectedProject != null">
         <p class="title">
-          {{ data.project.name }}
+          {{ selectedProject.name }}
         </p>
-        <p class="subtitle">{{ data.project.description }}</p>
+        <p class="subtitle">{{ selectedProject.description }}</p>
       </div>
-    </div>
 
-      <div class="container" v-if="data.configures.length >0">
+
+      <div class="container" v-if="selectedProject.configures.length >0">
         <b-table
-          :data="data.configures"
+          :data="selectedProject.configures"
           :loading="loading">
 
           <b-table-column label="Configure Name" v-slot="props">
@@ -52,8 +52,18 @@
 
         </b-table>
       </div>
-      <div v-if="data.configures.length === 0">
-        <p class="has-text-2"> No Configures Provided</p>
+      <div v-if="selectedProject.configures.length === 0" class="columns is-multiline"
+           style="text-align: center;height: 30vh;justify-content: center;align-items: center">
+        <div class="column is-12 "
+        >
+          <p class="is-size-3"> No Configures Provided</p>
+        </div>
+        <div class="column is-12">
+          <b-button type="is-primary" icon-left="plus" @click="$router.push(`${selectedProject.slug}/configures/new`)">
+            Add Configure
+          </b-button>
+        </div>
+
       </div>
 
 
@@ -68,26 +78,38 @@
         aria-modal>
 
         <template #default="props">
-          <FormEditProject :project-prop="data.project" v-on:close="isComponentModalActive = false"
-                           v-if="isComponentModalActive"/>
+          <FormEditProject :project-prop="selectedProject" v-on:close="isComponentModalActive = false"
+                           v-if="isComponentModalActive" mode="edit"/>
         </template>
       </b-modal>
 
 
-    <div class="container">
-      <div v-if="!data.response">
-        <p class="is-size-5">
-          No response.json provided
-        </p>
-        <b-button type="is-primary" icon-left="plus">Add Response</b-button>
-      </div>
-      <div v-else>
-        <p class="is-size-5" v-if="data.response != null">
-          Edit response.json here
-        </p>
-        <b-button type="is-info" icon-left="pencil" v-if="data.response != null && data.configures.length > 0">Edit
-          Response
-        </b-button>
+      <div class="container">
+        <div v-if="!selectedProject.response" class="columns is-multiline"
+             style="text-align: center;height: 30vh;justify-content: center;align-items: center">
+
+
+          <div class="column is-12">
+            <p class="is-size-3"> No response.json provided</p>
+          </div>
+
+          <div class="column is-12">
+            <b-button type="is-primary" icon-left="plus">Add Response</b-button>
+          </div>
+
+
+        </div>
+        <div v-else>
+          <p class="is-size-5" v-if="selectedProject.response != null">
+            Edit response.json here
+          </p>
+
+
+          <b-button type="is-info" icon-left="pencil"
+                    v-if="selectedProject.response != null && selectedProject.configures.length > 0">Edit
+            Response
+          </b-button>
+        </div>
       </div>
     </div>
   </section>
@@ -95,7 +117,7 @@
 
 <script>
 import {showToast} from "@/services/utils";
-import {mapActions} from "vuex";
+import {mapActions, mapGetters} from "vuex";
 import FormEditProject from "@/components/FormEditProject";
 
 
@@ -105,18 +127,19 @@ export default {
   watch: {
     isComponentModalActive(newVal) {
       if (newVal) {
-        this.form.name = this.data.project.name;
-        this.form.description = this.data.project.description;
+        this.form.name = this.selectedProject.name;
+        this.form.description = this.selectedProject.description;
       }
     }
   },
+  computed: {
+    ...mapGetters({
+      selectedProject: 'projects/getSelectedProject'
+    })
+  },
   data() {
     return {
-      data: {
-        project: null,
-        configures: [],
-        response: null
-      },
+
       form: {
         name: null,
         description: null
@@ -139,13 +162,14 @@ export default {
     /*
 * Load async data
 */async loadAsyncData() {
-
+      this.loading = true;
       try {
-        this.loading = true;
-        let response = await this.getProjectBySlug(this.$route.params.projectSlug);
-        this.data = response.data;
-        console.log("response data is");
-        console.log(response.data);
+
+        await this.getProjectBySlug(this.$route.params.projectSlug);
+        console.log("selectedProject is");
+
+        console.log(this.selectedProject);
+
       } catch (err) {
         showToast(err.response.data.message, 'is-danger', 'is-bottom');
       }
@@ -156,42 +180,42 @@ export default {
     /*
 * Handle page-change event
 */
-    onPageChange(page) {
-      this.page = page
-      this.loadAsyncData()
-    },
+    // onPageChange(page) {
+    //   this.page = page
+    //   this.loadAsyncData()
+    // },
     /*
 * Handle sort event
 */
-    onSort(field, order) {
-      this.sortField = field
-      this.sortOrder = order
-      this.loadAsyncData()
-    },
+    // onSort(field, order) {
+    //   this.sortField = field
+    //   this.sortOrder = order
+    //   this.loadAsyncData()
+    // },
     /*
 * Type style in relation to the value
 */
-    type(value) {
-      const number = parseFloat(value)
-      if (number < 6) {
-        return 'is-danger'
-      } else if (number >= 6 && number < 8) {
-        return 'is-warning'
-      } else if (number >= 8) {
-        return 'is-success'
-      }
-    }
+    // type(value) {
+    //   const number = parseFloat(value)
+    //   if (number < 6) {
+    //     return 'is-danger'
+    //   } else if (number >= 6 && number < 8) {
+    //     return 'is-warning'
+    //   } else if (number >= 8) {
+    //     return 'is-success'
+    //   }
+    // }
   },
-  filters: {
-    /**
-     * Filter to truncate string, accepts a length parameter
-     */
-    truncate(value, length) {
-      return value.length > length
-        ? value.substr(0, length) + '...'
-        : value
-    }
-  },
+  // filters: {
+  //   /**
+  //    * Filter to truncate string, accepts a length parameter
+  //    */
+  //   truncate(value, length) {
+  //     return value.length > length
+  //       ? value.substr(0, length) + '...'
+  //       : value
+  //   }
+  // },
   async created() {
     await this.loadAsyncData()
   }
