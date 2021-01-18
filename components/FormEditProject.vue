@@ -40,6 +40,7 @@
               label="Close"
               @click="emitClose()"/>
             <b-button
+              :loading="isLoading"
               label="Save"
               native-type="submit"
               type="is-primary"/>
@@ -52,6 +53,8 @@
 
 <script>
 import {ValidationObserver, ValidationProvider} from "vee-validate";
+import {mapActions} from "vuex";
+import {showToast} from "@/services/utils";
 
 export default {
   components: {
@@ -59,22 +62,42 @@ export default {
     ValidationProvider
   },
   props: {
-    projectProp: Object
+    projectProp: Object,
+    mode: String,
   },
   watch: {
     projectProp(val) {
-      console.log("watcher tirggered");
+
       this.project = {...val};
     }
   },
   data() {
     return {
-      project: {...this.projectProp}
+      project: {...this.projectProp},
+      isLoading: false,
     }
   },
   methods: {
-    onSubmit() {
-      console.log("submit triggered");
+    ...mapActions({
+      addNewProject: 'projects/saveProject'
+    }),
+    async addProject(){
+      try {
+
+          await this.addNewProject(this.project);
+          showToast('Add Success', 'is-success', 'is-bottom')
+
+      } catch (err) {
+        showToast(err.response.data.message, 'is-success', 'is-bottom')
+      }
+    },
+    async onSubmit() {
+      this.isLoading = false;
+      if(this.mode === 'add'){
+        await this.addProject()
+      }
+      this.isLoading = false;
+      this.emitClose();
     },
     emitClose() {
       this.resetForm();
@@ -93,3 +116,22 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.form-project {
+
+  @media (max-width: 500px) {
+    width: 100%;
+  }
+
+  @media (min-width: 501px)  and  (max-width: 1023px) {
+    width: 100%;
+  }
+  @media (min-width: 1024px) and  (max-width: 1366px){
+    width: 960px;
+  }
+  @media(min-width: 1366px ){
+    width: 1024px;
+  }
+}
+</style>
