@@ -1,12 +1,16 @@
 <template>
   <section class="section">
-    <p class="is-size-2">Project Detail
-      <b-button
-        v-if="selectedProject != null"
-        @click="isComponentModalActive = true"
-        type="is-primary"
-        icon-left="pencil"/>
-    </p>
+    <div class="columns">
+      <div class="column is-10">
+        <p class="is-size-2">Project Detail
+
+        </p>
+      </div>
+      <div class="column is-2" v-if="!loading">
+        <b-button type="is-primary" icon-left="plus" expanded @click="updateSelectedProject()"> Save</b-button>
+      </div>
+    </div>
+
     <div class="container" v-if="loading">
       <div>
         <b-skeleton :animated="skeletonAnimated"></b-skeleton>
@@ -20,37 +24,67 @@
     </div>
     <div class="container" v-else>
       <div v-if="selectedProject != null">
-        <p class="title">
-          {{ selectedProject.name }}
-        </p>
-        <p class="subtitle">{{ selectedProject.description }}</p>
+
+        <b-field label="Project Name">
+          <b-input v-model="localStateSelectedProject.name">
+
+          </b-input>
+        </b-field>
+
+        <b-field label="Project Description">
+          <b-input type="textarea" v-model="localStateSelectedProject.description">
+
+          </b-input>
+        </b-field>
+
       </div>
 
-
+      <hr>
       <div class="container" v-if="selectedProject.configures.length >0">
-        <b-table
-          :data="selectedProject.configures"
-          :loading="loading">
+        <div class="columns is-multiline">
+          <div class="column is-10">
+            <p class="is-size-4 has-text-weight-medium"> Configures</p>
+            <p>You can arrange your configuration order for sequential request</p>
+          </div>
 
-          <b-table-column label="Configure Name" v-slot="props">
-            Configure-{{ props.index }}
-          </b-table-column>
+          <div class="column is-2">
+            <b-button type="is-primary" icon-left="plus" expanded
+                      @click="$router.push(`${localStateSelectedProject.slug}/configures/new`) "> Add Configures
+            </b-button>
+          </div>
+        </div>
 
-          <b-table-column label="Edit" v-slot="props">
+        <draggable v-model="selectedProject.configures" group="people" @start="drag=true" @end="drag=false">
 
-            <div class="buttons">
-              <b-button type="is-info" size="is-small" icon-left="pencil"
-                        @click="$router.push(`${$route.params.projectSlug}/configures/${props.row._id}`)">Edit
-              </b-button>
+
+          <div class="columns is-multiline configure-item"
+               v-for="(element,index) in selectedProject.configures" :key="element._id"
+               style="border-bottom: 1px solid #bfbfbf; margin : 4px 0px">
+            <div class="column is-3">
+              Configure-{{ index }}
 
             </div>
-          </b-table-column>
+            <div class="column is-3">
+              {{ element._id }}
+            </div>
+            <div class="column is-3" style=" white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;">
+              {{ element.description }}
+            </div>
+            <div class="column is-3">
+              <div class="buttons">
+                <b-button type="is-info" size="is-small" icon-left="pencil"
+                          @click="$router.push(`${$route.params.projectSlug}/configures/${element._id}`)">Edit
+                </b-button>
+                <b-button type="is-danger" size="is-small" icon-left="delete" @click="deleteConfigure(element._id)">
+                  Delete
+                </b-button>
+              </div>
+            </div>
+          </div>
+        </draggable>
 
-          <b-table-column label="Delete" v-slot="props">
-            <b-button type="is-danger" size="is-small" icon-left="delete">Delete</b-button>
-          </b-table-column>
-
-        </b-table>
       </div>
       <div v-if="selectedProject.configures.length === 0" class="columns is-multiline"
            style="text-align: center;height: 30vh;justify-content: center;align-items: center">
@@ -59,7 +93,8 @@
           <p class="is-size-3"> No Configures Provided</p>
         </div>
         <div class="column is-12">
-          <b-button type="is-primary" icon-left="plus" @click="$router.push(`${selectedProject.slug}/configures/new`)">
+          <b-button type="is-primary" icon-left="plus"
+                    @click="$router.push(`${localStateSelectedProject.slug}/configures/new`)">
             Add Configure
           </b-button>
         </div>
@@ -67,21 +102,6 @@
       </div>
 
 
-      <b-modal
-        v-model="isComponentModalActive"
-        has-modal-card
-        trap-focus
-        :destroy-on-hide="false"
-        aria-role="dialog"
-        aria-label="Example Modal"
-
-        aria-modal>
-
-        <template #default="props">
-          <FormEditProject :project-prop="selectedProject" v-on:close="isComponentModalActive = false"
-                           v-if="isComponentModalActive" mode="edit"/>
-        </template>
-      </b-modal>
 
 
       <div class="container">
@@ -119,19 +139,12 @@
 import {showToast} from "@/services/utils";
 import {mapActions, mapGetters} from "vuex";
 import FormEditProject from "@/components/FormEditProject";
-
+import draggable from 'vuedraggable'
 
 export default {
-  components: {FormEditProject},
+  components: {FormEditProject, draggable},
   layout: 'nav',
-  watch: {
-    isComponentModalActive(newVal) {
-      if (newVal) {
-        this.form.name = this.selectedProject.name;
-        this.form.description = this.selectedProject.description;
-      }
-    }
-  },
+
   computed: {
     ...mapGetters({
       selectedProject: 'projects/getSelectedProject'
@@ -139,11 +152,10 @@ export default {
   },
   data() {
     return {
+      localStateSelectedProject: null,
 
-      form: {
-        name: null,
-        description: null
-      },
+
+
       isComponentModalActive: false,
       skeletonAnimated: true,
       // total: 0,
@@ -157,8 +169,11 @@ export default {
   },
   methods: {
     ...mapActions({
-      getProjectBySlug: 'projects/fetchProjectBySlug'
+      getProjectBySlug: 'projects/fetchProjectBySlug',
+      updateProjectBySlug: 'projects/updateProjectBySlug',
+      deleteSpecificConfigure: 'projects/deleteSpecificConfigure',
     }),
+
     /*
 * Load async data
 */async loadAsyncData() {
@@ -166,17 +181,44 @@ export default {
       try {
 
         await this.getProjectBySlug(this.$route.params.projectSlug);
-        console.log("selectedProject is");
 
-        console.log(this.selectedProject);
+        this.localStateSelectedProject = JSON.parse(JSON.stringify(this.selectedProject));
+
 
       } catch (err) {
         showToast(err.response.data.message, 'is-danger', 'is-bottom');
       }
       this.loading = false;
 
-
     },
+    async updateSelectedProject() {
+      this.loading = true;
+      try {
+        await this.updateProjectBySlug({project: this.localStateSelectedProject});
+        this.localStateSelectedProject = JSON.parse(JSON.stringify(this.selectedProject));
+        showToast('Saved', 'is-success', 'is-bottom');
+        const {projectSlug} = this.$route.params
+        if (projectSlug !== this.selectedProject.slug) {
+          await this.$router.replace(`/projects/${this.selectedProject.slug}`)
+        }
+
+
+      } catch (err) {
+        showToast(err.response, 'is-danger', 'is-bottom');
+      }
+      this.loading = false;
+    },
+    async deleteConfigure(configureId) {
+      this.loading = true;
+      try {
+        const {projectSlug} = this.$route.params
+        await this.deleteSpecificConfigure({projectSlug, configureId})
+
+      } catch (err) {
+        showToast(err, 'is-danger', 'is-bottom');
+      }
+      this.loading = false;
+    }
     /*
 * Handle page-change event
 */
@@ -218,12 +260,19 @@ export default {
   // },
   async created() {
     await this.loadAsyncData()
-  }
+  },
+
 }
 </script>
 
 <style lang="scss" scoped>
 .container {
   padding: 10px;
+}
+
+.configure-item:hover {
+  cursor: grabbing;
+
+
 }
 </style>
