@@ -54,11 +54,11 @@
           </div>
         </div>
 
-        <draggable v-model="selectedProject.configures" group="people" @start="drag=true" @end="drag=false">
+        <draggable v-model="localStateSelectedProject.configures" group="people" @start="drag=true" @end="drag=false">
 
 
           <div class="columns is-multiline configure-item"
-               v-for="(element,index) in selectedProject.configures" :key="element._id"
+               v-for="(element,index) in localStateSelectedProject.configures" :key="element._id"
                style="border-bottom: 1px solid #bfbfbf; margin : 4px 0px">
             <div class="column is-3">
               Configure-{{ index }}
@@ -102,33 +102,32 @@
       </div>
 
 
-
-
       <div class="container">
-        <div v-if="!selectedProject.response" class="columns is-multiline"
+        <div v-if="!selectedProject.finalResponse" class="columns is-multiline"
              style="text-align: center;height: 30vh;justify-content: center;align-items: center">
 
 
           <div class="column is-12">
             <p class="is-size-3"> No response.json provided</p>
+            <p>Please Provide your response in this below editor</p>
           </div>
 
           <div class="column is-12">
-            <b-button type="is-primary" icon-left="plus">Add Response</b-button>
+            <Editor :prop-code="finalResponse"/>
           </div>
 
 
         </div>
         <div v-else>
-          <p class="is-size-5" v-if="selectedProject.response != null">
-            Edit response.json here
+          <p class="is-size-5">
+            Edit your project response here
           </p>
 
 
-          <b-button type="is-info" icon-left="pencil"
-                    v-if="selectedProject.response != null && selectedProject.configures.length > 0">Edit
-            Response
-          </b-button>
+          <div class="column is-12">
+            <Editor :prop-code="localStateSelectedProject.finalResponse" v-on:on-change-code="onChangeCode"/>
+          </div>
+
         </div>
       </div>
     </div>
@@ -140,9 +139,10 @@ import {showToast} from "@/services/utils";
 import {mapActions, mapGetters} from "vuex";
 import FormEditProject from "@/components/FormEditProject";
 import draggable from 'vuedraggable'
+import Editor from "@/components/Editor";
 
 export default {
-  components: {FormEditProject, draggable},
+  components: {FormEditProject, draggable, Editor},
   layout: 'nav',
 
   computed: {
@@ -153,9 +153,6 @@ export default {
   data() {
     return {
       localStateSelectedProject: null,
-
-
-
       isComponentModalActive: false,
       skeletonAnimated: true,
       // total: 0,
@@ -164,16 +161,38 @@ export default {
       sortOrder: 'desc',
       defaultSortOrder: 'desc',
       page: 1,
-      perPage: 20
+      perPage: 20,
+      finalResponse: {
+        configure_based: "",
+        response: {
+          transform: "",
+          log_after_modify: "",
+          adds: {
+            header: {},
+            body: {}
+          },
+          modifies: {
+            header: [],
+            body: {}
+          },
+          deletes: {
+            header: [],
+            body: []
+          }
+        }
+      }
     }
   },
   methods: {
     ...mapActions({
       getProjectBySlug: 'projects/fetchProjectBySlug',
       updateProjectBySlug: 'projects/updateProjectBySlug',
-      deleteSpecificConfigure: 'projects/deleteSpecificConfigure',
+      deleteSpecificConfigure: 'projects/deleteSpecificConfigure'
     }),
 
+    onChangeCode(val){
+      this.localStateSelectedProject.finalResponse = val;
+    },
     /*
 * Load async data
 */async loadAsyncData() {
@@ -195,7 +214,7 @@ export default {
       this.loading = true;
       try {
         await this.updateProjectBySlug({project: this.localStateSelectedProject});
-        this.localStateSelectedProject = JSON.parse(JSON.stringify(this.selectedProject));
+
         showToast('Saved', 'is-success', 'is-bottom');
         const {projectSlug} = this.$route.params
         if (projectSlug !== this.selectedProject.slug) {
@@ -260,6 +279,18 @@ export default {
   // },
   async created() {
     await this.loadAsyncData()
+  },
+  beforeRouteLeave(to,from,next){
+    console.log("to is");
+    console.log(to);
+    this.$buefy.dialog.confirm({
+      title: 'Leaving Page',
+      message: 'Are you sure you want to <b>Leave</b> this page? Please <b> Save </b> your project first.',
+      confirmText: 'Leave Page',
+      type: 'is-danger',
+      hasIcon: true,
+      onConfirm: () => next()
+    })
   },
 
 }
