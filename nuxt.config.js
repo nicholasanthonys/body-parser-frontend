@@ -33,6 +33,7 @@ export default {
     "~/plugins/vee-validate.js",
     "~/plugins/vue-masonry.js",
     '~/plugins/json-edit.js',
+    '~/plugins/vue-draggable.js',
 
   ],
 
