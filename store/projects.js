@@ -24,7 +24,7 @@ export const actions = {
         }).catch(error => reject(error));
     }))
   },
-  updateProjectBySlug(context,data){
+  updateProjectBySlug(context, data) {
     return new Promise(((resolve, reject) => {
       this.$axios.put('/project', data)
         .then(response => {
@@ -74,6 +74,23 @@ export const actions = {
           resolve(response)
         }).catch(error => reject(error));
     }))
+  },
+  async deleteSpecificConfigure(context, data) {
+    const {projectSlug, configureId} = data;
+    return new Promise(((resolve, reject) => {
+      this.$axios.delete(`/configure`, {
+        params: {
+          projectSlug,
+          configureId
+        }
+      })
+        .then(response => {
+
+          context.commit("removeSpecificConfigure", configureId)
+
+          resolve(response)
+        }).catch(error => reject(error));
+    }))
   }
 }
 export const mutations = {
@@ -90,6 +107,9 @@ export const mutations = {
   removeProjectBySlug(state, slug) {
     state.projects = [...state.projects.filter(element => element.slug !== slug)]
   },
+  removeSpecificConfigure(state, configureId) {
+    state.selectedProject.configures = [...state.selectedProject.configures.filter(element => element._id !== configureId)];
+  }
 
 
 }
