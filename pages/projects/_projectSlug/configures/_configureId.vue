@@ -131,13 +131,13 @@ export default {
     async newConfigure() {
       const {projectSlug, } = this.$route.params;
       try {
-        let response = this.$axios.post(`/configure`, {
+        let response =  await this.$axios.post(`/configure`, {
           projectSlug,
           description : this.configure.description,
           config: this.configure.config
         });
         this.setSelectedProject(response.data)
-        this.$router.go(-1)
+        await this.$router.push(`/projects/${projectSlug}`)
       } catch (err) {
         showToast(err.response.data.message, 'is-danger', 'is-top')
       }
@@ -145,7 +145,7 @@ export default {
     async updateConfigure() {
       const {projectSlug, configureId} = this.$route.params;
       try {
-        let response = this.$axios.put(`/configure?projectSlug=${projectSlug}&configureId=${configureId}`, {
+        let response = await this.$axios.put(`/configure?projectSlug=${projectSlug}&configureId=${configureId}`, {
 
           description : this.configure.description,
           config: this.configure.config
