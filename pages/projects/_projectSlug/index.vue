@@ -48,15 +48,17 @@
           </div>
 
           <div class="column is-2">
-            <b-button type="is-primary" icon-left="plus" expanded @click="$router.push(`${localStateSelectedProject.slug}/configures/new`) "> Add Configures</b-button>
+            <b-button type="is-primary" icon-left="plus" expanded
+                      @click="$router.push(`${localStateSelectedProject.slug}/configures/new`) "> Add Configures
+            </b-button>
           </div>
         </div>
 
-        <draggable v-model="localStateSelectedProject.configures" group="people" @start="drag=true" @end="drag=false">
+        <draggable v-model="selectedProject.configures" group="people" @start="drag=true" @end="drag=false">
 
 
           <div class="columns is-multiline configure-item"
-               v-for="(element,index) in localStateSelectedProject.configures" :key="element._id"
+               v-for="(element,index) in selectedProject.configures" :key="element._id"
                style="border-bottom: 1px solid #bfbfbf; margin : 4px 0px">
             <div class="column is-3">
               Configure-{{ index }}
@@ -75,7 +77,9 @@
                 <b-button type="is-info" size="is-small" icon-left="pencil"
                           @click="$router.push(`${$route.params.projectSlug}/configures/${element._id}`)">Edit
                 </b-button>
-                <b-button type="is-danger" size="is-small" icon-left="delete">Delete</b-button>
+                <b-button type="is-danger" size="is-small" icon-left="delete" @click="deleteConfigure(element._id)">
+                  Delete
+                </b-button>
               </div>
             </div>
           </div>
@@ -98,21 +102,6 @@
       </div>
 
 
-      <b-modal
-        v-model="isComponentModalActive"
-        has-modal-card
-        trap-focus
-        :destroy-on-hide="false"
-        aria-role="dialog"
-        aria-label="Example Modal"
-
-        aria-modal>
-
-        <template #default="props">
-          <FormEditProject :project-prop="selectedProject" v-on:close="isComponentModalActive = false"
-                           v-if="isComponentModalActive" mode="edit"/>
-        </template>
-      </b-modal>
 
 
       <div class="container">
@@ -155,14 +144,7 @@ import draggable from 'vuedraggable'
 export default {
   components: {FormEditProject, draggable},
   layout: 'nav',
-  watch: {
-    isComponentModalActive(newVal) {
-      if (newVal) {
-        this.form.name = this.selectedProject.name;
-        this.form.description = this.selectedProject.description;
-      }
-    }
-  },
+
   computed: {
     ...mapGetters({
       selectedProject: 'projects/getSelectedProject'
@@ -171,10 +153,9 @@ export default {
   data() {
     return {
       localStateSelectedProject: null,
-      form: {
-        name: null,
-        description: null
-      },
+
+
+
       isComponentModalActive: false,
       skeletonAnimated: true,
       // total: 0,
@@ -189,7 +170,8 @@ export default {
   methods: {
     ...mapActions({
       getProjectBySlug: 'projects/fetchProjectBySlug',
-      updateProjectBySlug: 'projects/updateProjectBySlug'
+      updateProjectBySlug: 'projects/updateProjectBySlug',
+      deleteSpecificConfigure: 'projects/deleteSpecificConfigure',
     }),
 
     /*
@@ -216,13 +198,24 @@ export default {
         this.localStateSelectedProject = JSON.parse(JSON.stringify(this.selectedProject));
         showToast('Saved', 'is-success', 'is-bottom');
         const {projectSlug} = this.$route.params
-        if(projectSlug !== this.selectedProject.slug){
+        if (projectSlug !== this.selectedProject.slug) {
           await this.$router.replace(`/projects/${this.selectedProject.slug}`)
         }
 
 
       } catch (err) {
         showToast(err.response, 'is-danger', 'is-bottom');
+      }
+      this.loading = false;
+    },
+    async deleteConfigure(configureId) {
+      this.loading = true;
+      try {
+        const {projectSlug} = this.$route.params
+        await this.deleteSpecificConfigure({projectSlug, configureId})
+
+      } catch (err) {
+        showToast(err, 'is-danger', 'is-bottom');
       }
       this.loading = false;
     }
