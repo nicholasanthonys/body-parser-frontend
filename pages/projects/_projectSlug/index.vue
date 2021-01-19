@@ -44,35 +44,37 @@
         <div class="columns is-multiline">
           <div class="column is-10">
             <p class="is-size-4 has-text-weight-medium"> Configures</p>
+            <p>You can arrange your configuration order for sequential request</p>
           </div>
 
           <div class="column is-2">
             <b-button type="is-primary" icon-left="plus" expanded> Add Configures</b-button>
           </div>
         </div>
-        <b-table
-          :data="localStateSelectedProject.configures"
-          :loading="loading">
 
-          <b-table-column label="Configure Name" v-slot="props">
-            Configure-{{ props.index }}
-          </b-table-column>
+        <draggable v-model="localStateSelectedProject.configures" group="people" @start="drag=true" @end="drag=false">
 
-          <b-table-column label="Edit" v-slot="props">
 
-            <div class="buttons">
-              <b-button type="is-info" size="is-small" icon-left="pencil"
-                        @click="$router.push(`${$route.params.projectSlug}/configures/${props.row._id}`)">Edit
-              </b-button>
+          <div class="columns is-multiline configure-item"
+               v-for="(element,index) in localStateSelectedProject.configures" :key="element._id" style="border-bottom: 1px solid #bfbfbf; margin : 4px 0px">
+            <div class="column is-4">
+              Configure-{{ index }}
 
             </div>
-          </b-table-column>
+            <div class="column is-4">
+              {{ element._id }}
+            </div>
+            <div class="column is-4">
+              <div class="buttons">
+                <b-button type="is-info" size="is-small" icon-left="pencil"
+                          @click="$router.push(`${$route.params.projectSlug}/configures/${element._id}`)">Edit
+                </b-button>
+                <b-button type="is-danger" size="is-small" icon-left="delete">Delete</b-button>
+              </div>
+            </div>
+          </div>
+        </draggable>
 
-          <b-table-column label="Delete" v-slot="props">
-            <b-button type="is-danger" size="is-small" icon-left="delete">Delete</b-button>
-          </b-table-column>
-
-        </b-table>
       </div>
       <div v-if="selectedProject.configures.length === 0" class="columns is-multiline"
            style="text-align: center;height: 30vh;justify-content: center;align-items: center">
@@ -142,10 +144,10 @@
 import {showToast} from "@/services/utils";
 import {mapActions, mapGetters} from "vuex";
 import FormEditProject from "@/components/FormEditProject";
-
+import draggable from 'vuedraggable'
 
 export default {
-  components: {FormEditProject},
+  components: {FormEditProject, draggable},
   layout: 'nav',
   watch: {
     isComponentModalActive(newVal) {
@@ -262,5 +264,11 @@ export default {
 <style lang="scss" scoped>
 .container {
   padding: 10px;
+}
+.configure-item:hover{
+   cursor: grabbing;
+
+
+
 }
 </style>
