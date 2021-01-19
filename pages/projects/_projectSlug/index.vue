@@ -113,7 +113,7 @@
           </div>
 
           <div class="column is-12">
-            <Editor :prop-code="finalResponse"/>
+            <Editor :prop-code="finalResponse"  v-on:on-change-code="onChangeCode"/>
           </div>
 
 
@@ -191,6 +191,7 @@ export default {
     }),
 
     onChangeCode(val){
+
       this.localStateSelectedProject.finalResponse = val;
     },
     /*
