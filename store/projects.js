@@ -24,6 +24,18 @@ export const actions = {
         }).catch(error => reject(error));
     }))
   },
+  updateProjectBySlug(context,data){
+    return new Promise(((resolve, reject) => {
+      this.$axios.put('/project', data)
+        .then(response => {
+          if (response.status === 200) {
+            const {project} = response.data
+            context.commit("setSelectedProject", project)
+          }
+          resolve(response)
+        }).catch(error => reject(error));
+    }))
+  },
   async fetchProjects(context) {
     return new Promise(((resolve, reject) => {
       this.$axios.get('/project')
