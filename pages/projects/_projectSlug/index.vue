@@ -112,7 +112,7 @@
             <p>Please Provide your response in this below editor</p>
           </div>
 
-          <div class="column is-12">
+          <div class="column is-12" style="text-align: left">
             <Editor :prop-code="finalResponse"  v-on:on-change-code="onChangeCode"/>
           </div>
 
