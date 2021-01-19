@@ -48,7 +48,7 @@
           </div>
 
           <div class="column is-2">
-            <b-button type="is-primary" icon-left="plus" expanded> Add Configures</b-button>
+            <b-button type="is-primary" icon-left="plus" expanded @click="$router.push(`${localStateSelectedProject.slug}/configures/new`) "> Add Configures</b-button>
           </div>
         </div>
 
@@ -56,15 +56,21 @@
 
 
           <div class="columns is-multiline configure-item"
-               v-for="(element,index) in localStateSelectedProject.configures" :key="element._id" style="border-bottom: 1px solid #bfbfbf; margin : 4px 0px">
-            <div class="column is-4">
+               v-for="(element,index) in localStateSelectedProject.configures" :key="element._id"
+               style="border-bottom: 1px solid #bfbfbf; margin : 4px 0px">
+            <div class="column is-3">
               Configure-{{ index }}
 
             </div>
-            <div class="column is-4">
+            <div class="column is-3">
               {{ element._id }}
             </div>
-            <div class="column is-4">
+            <div class="column is-3" style=" white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;">
+              {{ element.description }}
+            </div>
+            <div class="column is-3">
               <div class="buttons">
                 <b-button type="is-info" size="is-small" icon-left="pencil"
                           @click="$router.push(`${$route.params.projectSlug}/configures/${element._id}`)">Edit
@@ -185,6 +191,7 @@ export default {
       getProjectBySlug: 'projects/fetchProjectBySlug',
       updateProjectBySlug: 'projects/updateProjectBySlug'
     }),
+
     /*
 * Load async data
 */async loadAsyncData() {
@@ -208,7 +215,11 @@ export default {
         await this.updateProjectBySlug({project: this.localStateSelectedProject});
         this.localStateSelectedProject = JSON.parse(JSON.stringify(this.selectedProject));
         showToast('Saved', 'is-success', 'is-bottom');
-        await this.$router.replace(`/projects/${this.selectedProject.slug}`)
+        const {projectSlug} = this.$route.params
+        if(projectSlug !== this.selectedProject.slug){
+          await this.$router.replace(`/projects/${this.selectedProject.slug}`)
+        }
+
 
       } catch (err) {
         showToast(err.response, 'is-danger', 'is-bottom');
@@ -265,9 +276,9 @@ export default {
 .container {
   padding: 10px;
 }
-.configure-item:hover{
-   cursor: grabbing;
 
+.configure-item:hover {
+  cursor: grabbing;
 
 
 }
