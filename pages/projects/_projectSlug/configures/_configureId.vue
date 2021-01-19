@@ -103,7 +103,7 @@ export default {
 
       this.configure.config = val;
 
-      console.log(this.configure)
+
     },
     async loadConfigure() {
       const {projectSlug, configureId} = this.$route.params
