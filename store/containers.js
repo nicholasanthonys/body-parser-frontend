@@ -13,7 +13,14 @@ export const getters = {
   }
 }
 export const actions = {
-
+  async storeContainer(context,data){
+    return new Promise(((resolve, reject) => {
+      this.$axios.post('/container',data)
+        .then(response => {
+          resolve(response)
+        }).catch(error => reject(error));
+    }))
+  },
   async fetchContainers(context) {
     return new Promise(((resolve, reject) => {
       this.$axios.get('/container')
@@ -31,12 +38,23 @@ export const actions = {
       this.$axios.get(`/container/${containerSlug}`)
         .then(response => {
           if (response.status === 200) {
-            context.commit("setSelectedContainer", response.data)
+            context.commit("setSelectedContainer", response.data.container)
           }
           resolve(response)
         }).catch(error => reject(error));
     }))
   },
+  async  updateContainerBySlug(context,data){
+    return new Promise(((resolve, reject) => {
+      this.$axios.put(`/container`, data)
+        .then(response => {
+          if (response.status === 200) {
+            context.commit("setSelectedContainer", response.data.container)
+          }
+          resolve(response)
+        }).catch(error => reject(error));
+    }))
+  }
 }
 export const mutations = {
   setContainers(state,data){
