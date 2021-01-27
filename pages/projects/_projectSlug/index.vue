@@ -3,7 +3,6 @@
     <div class="columns">
       <div class="column is-10">
         <p class="is-size-2">Project Detail
-
         </p>
       </div>
       <div class="column is-2" v-if="!loading">
@@ -24,10 +23,8 @@
     </div>
     <div class="container" v-else>
       <div v-if="selectedProject != null">
-
         <b-field label="Project Name">
           <b-input v-model="localStateSelectedProject.name">
-
           </b-input>
         </b-field>
 
@@ -55,8 +52,6 @@
         </div>
 
         <draggable v-model="localStateSelectedProject.configures" group="people" @start="drag=true" @end="drag=false">
-
-
           <div class="columns is-multiline configure-item"
                v-for="(element,index) in localStateSelectedProject.configures" :key="element._id"
                style="border-bottom: 1px solid #bfbfbf; margin : 4px 0px">
@@ -113,7 +108,7 @@
           </div>
 
           <div class="column is-12" style="text-align: left">
-            <Editor :prop-code="finalResponse"  v-on:on-change-code="onChangeCode"/>
+            <Editor :prop-code="finalResponse" v-on:on-change-code="onChangeCode"/>
           </div>
 
 
@@ -155,13 +150,7 @@ export default {
       localStateSelectedProject: null,
       isComponentModalActive: false,
       skeletonAnimated: true,
-      // total: 0,
       loading: false,
-      sortField: 'vote_count',
-      sortOrder: 'desc',
-      defaultSortOrder: 'desc',
-      page: 1,
-      perPage: 20,
       finalResponse: {
         configure_based: "",
         response: {
@@ -190,7 +179,7 @@ export default {
       deleteSpecificConfigure: 'projects/deleteSpecificConfigure'
     }),
 
-    onChangeCode(val){
+    onChangeCode(val) {
 
       this.localStateSelectedProject.finalResponse = val;
     },
@@ -239,51 +228,14 @@ export default {
       }
       this.loading = false;
     }
-    /*
-* Handle page-change event
-*/
-    // onPageChange(page) {
-    //   this.page = page
-    //   this.loadAsyncData()
-    // },
-    /*
-* Handle sort event
-*/
-    // onSort(field, order) {
-    //   this.sortField = field
-    //   this.sortOrder = order
-    //   this.loadAsyncData()
-    // },
-    /*
-* Type style in relation to the value
-*/
-    // type(value) {
-    //   const number = parseFloat(value)
-    //   if (number < 6) {
-    //     return 'is-danger'
-    //   } else if (number >= 6 && number < 8) {
-    //     return 'is-warning'
-    //   } else if (number >= 8) {
-    //     return 'is-success'
-    //   }
-    // }
+
   },
-  // filters: {
-  //   /**
-  //    * Filter to truncate string, accepts a length parameter
-  //    */
-  //   truncate(value, length) {
-  //     return value.length > length
-  //       ? value.substr(0, length) + '...'
-  //       : value
-  //   }
-  // },
+
   async created() {
     await this.loadAsyncData()
   },
-  beforeRouteLeave(to,from,next){
-    console.log("to is");
-    console.log(to);
+  beforeRouteLeave(to, from, next) {
+
     this.$buefy.dialog.confirm({
       title: 'Leaving Page',
       message: 'Are you sure you want to <b>Leave</b> this page? Please <b> Save </b> your project first.',

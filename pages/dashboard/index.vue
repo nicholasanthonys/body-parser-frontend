@@ -4,7 +4,7 @@
       <b-loading :is-full-page="isFullPageLoading" :active="isLoading"></b-loading>
     </div>
 
-    <div v-else>
+     <div v-else>
       <div class="columns is-multiline">
         <div class="column is-12">
           <p class="is-size-1 has-text-weight-bold"> Your Projects</p>
@@ -82,9 +82,9 @@
       aria-modal>
 
       <template #default="props">
-        <div >
+        <div>
           <FormEditProject :project-prop="newProject" v-on:close="isComponentModalActive = false"
-                           v-if="isComponentModalActive"   mode="add" />
+                           v-if="isComponentModalActive" mode="add"/>
         </div>
 
       </template>
