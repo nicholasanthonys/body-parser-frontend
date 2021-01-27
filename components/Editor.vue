@@ -1,15 +1,15 @@
 <template>
   <div class="columns is-multiline">
-    <div class="column is-12" >
+    <div class="column is-12">
       <b-switch v-model="isRightEditorEditable">
         Editable in the right editor
       </b-switch>
       <b-notification v-if="error"
-          type="is-danger"
-          aria-close-label="Close notification"
-          role="alert" :closable="false">
+                      type="is-danger"
+                      aria-close-label="Close notification"
+                      role="alert" :closable="false">
         Error in the right Editor
-        <p>   {{error}}</p>
+        <p> {{ error }}</p>
       </b-notification>
 
     </div>
@@ -38,10 +38,9 @@
 </template>
 <script>
 import VJsoneditor from "v-jsoneditor";
-import { PrismEditor } from "vue-prism-editor";
+import {PrismEditor} from "vue-prism-editor";
 import "vue-prism-editor/dist/prismeditor.min.css"; // import the styles
-
-import { highlight, languages } from "prismjs/components/prism-core";
+import {highlight, languages} from "prismjs/components/prism-core";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism-tomorrow.css";
 import {showToast} from "@/services/utils"; // import syntax highlighti
@@ -53,27 +52,27 @@ export default {
     VJsoneditor,
     PrismEditor,
   },
-  props : {
-    propCode : Object
+  props: {
+    propCode: [Object, Array]
   },
   watch: {
     code(newVal) {
-      this.jsonString = JSON.stringify({...newVal},null, "\t");
+      this.jsonString = JSON.stringify({...newVal}, null, "\t");
       this.$emit('on-change-code', newVal);
     },
-    jsonString(newVal){
-      try{
+    jsonString(newVal) {
+      try {
         this.code = JSON.parse(newVal)
         this.error = null;
-      }catch (err) {
+      } catch (err) {
         this.error = err.toString()
       }
     },
-    isRightEditorEditable(newVal){
-      if(newVal){
-        showToast('Right Editor is editable', 'is-primary','is-bottom')
-      }else{
-        showToast('Right Editor is read only', 'is-primary','is-bottom')
+    isRightEditorEditable(newVal) {
+      if (newVal) {
+        showToast('Right Editor is editable', 'is-primary', 'is-bottom')
+      } else {
+        showToast('Right Editor is read only', 'is-primary', 'is-bottom')
       }
     },
   },
@@ -81,12 +80,12 @@ export default {
     return {
       error: null,
       jsonString: null,
-      isRightEditorEditable : false,
+      isRightEditorEditable: false,
       lang: "json",
       code: {
         hello: "vue",
       },
-       options: {
+      options: {
         mode: MODE,
         onEditable: function (node) {
           // console.log("node")
@@ -108,14 +107,14 @@ export default {
   },
   created() {
     this.code = {...this.propCode};
-    this.jsonString = JSON.stringify(this.code,null, "\t");
+    this.jsonString = JSON.stringify(this.code, null, "\t");
   },
 
 };
 </script>
 
 <style lang="scss" scoped>
-$editorHeight : 400px;
+$editorHeight: 400px;
 .my-editor {
   /* we dont use `language-` classes anymore so thats why we need to add background and text color manually */
   background: #2d2d2d;
@@ -140,16 +139,16 @@ $editorHeight : 400px;
 div.prism-editor-wrapper {
   height: $editorHeight;
   overflow-y: auto;
-  div.prism-editor__container{
-    .prism-editor__editor{
-      .number{
-      background-color: red !important;
+
+  div.prism-editor__container {
+    .prism-editor__editor {
+      .number {
+        background-color: red !important;
       }
     }
   }
 
 }
-
 
 
 </style>
