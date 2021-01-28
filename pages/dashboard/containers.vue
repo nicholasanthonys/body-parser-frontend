@@ -11,7 +11,7 @@
           <p class="is-size-1 has-text-weight-bold"> Your Containers</p>
         </div>
         <div class="column is-12">
-          <b-button type="is-primary has-text-weight-bold" >Add New Container
+          <b-button type="is-primary has-text-weight-bold" @click="$router.push('/containers/create')" >Add New Container
           </b-button>
         </div>
       </div>
@@ -59,6 +59,7 @@
                 <b-icon
                   icon="delete"
                   size="is-small"
+                  @click.native="confirmDeleteContainer(container)"
                 >
                 </b-icon>
               </a>
@@ -92,8 +93,30 @@ export default {
   },
   methods : {
     ...mapActions({
-      fetchContainers : 'containers/fetchContainers'
+      fetchContainers : 'containers/fetchContainers',
+      deleteContainerById : 'containers/deleteContainer'
     }),
+    async confirmDeleteContainer(container){
+      this.$buefy.dialog.confirm({
+        title: `Deleting container ${container.slug}`,
+        message: 'Are you sure you want to <b>delete</b> this container ?',
+        confirmText: 'Delete Container',
+        type: 'is-danger',
+        hasIcon: true,
+        onConfirm: async () => await this.deleteContainer(container._id),
+
+      })
+    },
+    async deleteContainer(id){
+      this.isLoading = true;
+      try {
+        await this.deleteContainerById(id);
+        showToast('Delete Success', 'is-success', 'is-bottom');
+      }catch (err) {
+        showToast(err.response.data.message, 'is-danger','is-bottom')
+      }
+      this.isLoading = false;
+    },
     async loadContainers(){
       this.isLoading = true;
       try {
