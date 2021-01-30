@@ -8,7 +8,7 @@
     <div v-else>
       <div class="columns is-multiline">
         <div class="column is-12">
-          <p class="is-size-1 has-text-weight-bold"> Your Containers</p>
+          <p class="is-size-1 has-text-weight-bold"> Your Configuration Containers</p>
         </div>
         <div class="column is-12">
           <b-button type="is-primary has-text-weight-bold" @click="$router.push('/containers/create')" >Add New Container
