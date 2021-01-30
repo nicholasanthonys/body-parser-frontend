@@ -56,13 +56,25 @@ export default {
     propCode: [Object, Array]
   },
   watch: {
+
     code(newVal) {
-      this.jsonString = JSON.stringify({...newVal}, null, "\t");
-      this.$emit('on-change-code', newVal);
+
+      let temp = null;
+      if(Array.isArray(newVal)){
+         temp  = [...newVal]
+      }else{
+        //Object
+         temp = {...newVal};
+      }
+      this.jsonString = JSON.stringify(temp, null, "\t");
+      this.$emit('on-change-code', temp);
     },
+
     jsonString(newVal) {
+
       try {
         this.code = JSON.parse(newVal)
+
         this.error = null;
       } catch (err) {
         this.error = err.toString()
@@ -106,8 +118,15 @@ export default {
     },
   },
   created() {
-    this.code = {...this.propCode};
-    this.jsonString = JSON.stringify(this.code, null, "\t");
+    if(Array.isArray(this.propCode)){
+      this.code = [...this.propCode]
+    }else{
+      //Object
+      this.code = {...this.propCode};
+    }
+
+
+    this.jsonString = JSON.stringify(this.propCode, null, "\t");
   },
 
 };

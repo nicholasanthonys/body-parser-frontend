@@ -46,7 +46,7 @@ export default {
       isNew: this.$route.params.configureId === 'new',
       isLoading: false,
       configure: {
-        _id: null,
+        id: null,
         projectId: null,
         config: {
           request: {
@@ -106,13 +106,13 @@ export default {
 
     },
     async loadConfigure() {
-      const {projectSlug, configureId} = this.$route.params
+      const {projectId, configureId} = this.$route.params
 
       this.isLoading = true;
       try {
         let res = await this.$axios.get(`/configure`, {
           params: {
-            projectSlug,
+            projectId,
             configureId
           }
         })
@@ -129,23 +129,23 @@ export default {
       this.isLoading = false;
     },
     async newConfigure() {
-      const {projectSlug, } = this.$route.params;
+      const {projectId, } = this.$route.params;
       try {
         let response =  await this.$axios.post(`/configure`, {
-          projectSlug,
+          projectId,
           description : this.configure.description,
           config: this.configure.config
         });
         this.setSelectedProject(response.data)
-        await this.$router.push(`/projects/${projectSlug}`)
+        await this.$router.push(`/projects/${projectId}`)
       } catch (err) {
         showToast(err.response.data.message, 'is-danger', 'is-top')
       }
     },
     async updateConfigure() {
-      const {projectSlug, configureId} = this.$route.params;
+      const {projectId, configureId} = this.$route.params;
       try {
-        let response = await this.$axios.put(`/configure?projectSlug=${projectSlug}&configureId=${configureId}`, {
+        let response = await this.$axios.put(`/configure?projectId=${projectId}&configureId=${configureId}`, {
 
           description : this.configure.description,
           config: this.configure.config

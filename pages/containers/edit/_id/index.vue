@@ -19,7 +19,6 @@ export default {
   data(){
     return {
       selectedContainer : {
-        slug: null,
         name: null,
         projects: [],
         description: null,
@@ -36,8 +35,8 @@ export default {
   },
   methods : {
     ...mapActions({
-      updateContainer : 'containers/updateContainerBySlug',
-      fetchSelectedContainer: "containers/fetchContainerBySlug",
+      updateContainer : 'containers/updateContainer',
+      fetchSelectedContainer: "containers/fetchContainerById",
 
     }),
   async update(updatedContainer){
@@ -47,7 +46,7 @@ export default {
 
       //* Get array of projectIds
       let projectIds = [];
-      updatedContainer.projects.forEach((e) => projectIds.push(e._id));
+      updatedContainer.projects.forEach((e) => projectIds.push(e.id));
       updatedContainer.projectIds = projectIds;
 
       // Get array of router object
@@ -74,8 +73,8 @@ export default {
      async loadContainerDetail() {
       this.loading = true;
       try {
-        const { containerSlug } = this.$route.params;
-        let response = await this.fetchSelectedContainer(containerSlug);
+        const { id } = this.$route.params;
+        let response = await this.fetchSelectedContainer(id);
         let {container} = response.data;
         this.selectedContainer = container;
       } catch (err) {
