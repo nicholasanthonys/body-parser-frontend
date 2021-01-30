@@ -54,7 +54,20 @@ export const actions = {
           resolve(response)
         }).catch(error => reject(error));
     }))
+  },
+  async deleteContainer(context,id){
+
+    return new Promise(((resolve, reject) => {
+      this.$axios.delete(`/container/${id}`)
+        .then(response => {
+
+            context.commit("deleteContainerById", id)
+
+          resolve(response)
+        }).catch(error => reject(error));
+    }))
   }
+
 }
 export const mutations = {
   setContainers(state,data){
@@ -62,5 +75,8 @@ export const mutations = {
   },
   setSelectedContainer(state,data){
     state.selectedContainer = data;
+  },
+  deleteContainerById(state,id){
+    state.containers = [...state.containers.filter(container => container._id !== id)]
   }
 }
