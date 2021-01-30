@@ -54,7 +54,7 @@
       </div>
 
       <hr />
-
+        <p class="is-size-4 has-text-weight-bold"> Projects</p>
       <div class="container">
         <b-table
           :data="localStateSelectedContainer.projects"
