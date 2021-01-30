@@ -46,21 +46,21 @@
 
           <div class="column is-2">
             <b-button type="is-primary" icon-left="plus" expanded
-                      @click="$router.push(`${localStateSelectedProject.slug}/configures/new`) "> Add Configures
+                      @click="$router.push(`${localStateSelectedProject.id}/configures/new`) "> Add Configures
             </b-button>
           </div>
         </div>
 
         <draggable v-model="localStateSelectedProject.configures" group="people" @start="drag=true" @end="drag=false">
           <div class="columns is-multiline configure-item"
-               v-for="(element,index) in localStateSelectedProject.configures" :key="element._id"
+               v-for="(element,index) in localStateSelectedProject.configures" :key="element.id"
                style="border-bottom: 1px solid #bfbfbf; margin : 4px 0px">
             <div class="column is-3">
               Configure-{{ index }}
 
             </div>
             <div class="column is-3">
-              {{ element._id }}
+              {{ element.id }}
             </div>
             <div class="column is-3" style=" white-space: nowrap;
   overflow: hidden;
@@ -70,9 +70,9 @@
             <div class="column is-3">
               <div class="buttons">
                 <b-button type="is-info" size="is-small" icon-left="pencil"
-                          @click="$router.push(`${$route.params.projectSlug}/configures/${element._id}`)">Edit
+                          @click="$router.push(`${$route.params.projectId}/configures/${element.id}`)">Edit
                 </b-button>
-                <b-button type="is-danger" size="is-small" icon-left="delete" @click="deleteConfigure(element._id)">
+                <b-button type="is-danger" size="is-small" icon-left="delete" @click="deleteConfigure(element.id)">
                   Delete
                 </b-button>
               </div>
@@ -89,7 +89,7 @@
         </div>
         <div class="column is-12">
           <b-button type="is-primary" icon-left="plus"
-                    @click="$router.push(`${localStateSelectedProject.slug}/configures/new`)">
+                    @click="$router.push(`${localStateSelectedProject.id}/configures/new`)">
             Add Configure
           </b-button>
         </div>
@@ -174,8 +174,8 @@ export default {
   },
   methods: {
     ...mapActions({
-      getProjectBySlug: 'projects/fetchProjectBySlug',
-      updateProjectBySlug: 'projects/updateProjectBySlug',
+      getProjectById: 'projects/fetchProjectById',
+      updateProject: 'projects/updateProject',
       deleteSpecificConfigure: 'projects/deleteSpecificConfigure'
     }),
 
@@ -189,7 +189,7 @@ export default {
       this.loading = true;
       try {
 
-        await this.getProjectBySlug(this.$route.params.projectSlug);
+        await this.getProjectById(this.$route.params.projectId);
 
         this.localStateSelectedProject = JSON.parse(JSON.stringify(this.selectedProject));
 
@@ -203,13 +203,10 @@ export default {
     async updateSelectedProject() {
       this.loading = true;
       try {
-        await this.updateProjectBySlug({project: this.localStateSelectedProject});
+        await this.updateProject({project: this.localStateSelectedProject});
 
         showToast('Saved', 'is-success', 'is-bottom');
-        const {projectSlug} = this.$route.params
-        if (projectSlug !== this.selectedProject.slug) {
-          await this.$router.replace(`/projects/${this.selectedProject.slug}`)
-        }
+
 
 
       } catch (err) {
@@ -220,8 +217,8 @@ export default {
     async deleteConfigure(configureId) {
       this.loading = true;
       try {
-        const {projectSlug} = this.$route.params
-        await this.deleteSpecificConfigure({projectSlug, configureId})
+        const {projectId} = this.$route.params
+        await this.deleteSpecificConfigure({projectId, configureId})
 
       } catch (err) {
         showToast(err, 'is-danger', 'is-bottom');

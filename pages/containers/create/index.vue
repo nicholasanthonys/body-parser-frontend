@@ -29,22 +29,15 @@ export default {
       try {
         //* Get array of projectIds
         let projectIds = [];
-        newContainer.projects.forEach((e) => projectIds.push(e._id));
+        newContainer.projects.forEach((e) => projectIds.push(e.id));
         newContainer.projectIds = projectIds;
-        let routers = [];
-        //* Get array from routers
-        for (let k in newContainer.routers) {
-          if (newContainer.routers.hasOwnProperty(k)) {
-            routers.push(newContainer.routers[k]);
-          }
-        }
 
-        newContainer.routers = routers;
-        let response = await this.storeContainer(newContainer);
 
+        await this.storeContainer(newContainer);
+        this.$router.push({name : 'dashboard-containers'})
         showToast("Saved", "is-success", "is-bottom");
 
-        await this.$router.replace(`/containers/edit/${response.data.slug}`);
+
       } catch (err) {
         showToast(err.toString(), "is-danger", "is-bottom");
       }

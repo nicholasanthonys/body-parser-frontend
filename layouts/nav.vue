@@ -8,7 +8,7 @@
       <div class="navbar-brand">
         <a
           class="navbar-item"
-          href="/static"
+          href="/dashboard"
         >
           <img
             src="~assets/buefy.png"

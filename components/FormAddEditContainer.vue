@@ -13,6 +13,7 @@
                 icon-left="plus"
                 expanded
                 native-type="submit"
+
                 style="margin: 6px"
               >
                 Save
@@ -48,7 +49,7 @@
               <b-field label="Container Name">
                 <b-input v-model="localStateSelectedContainer.name"></b-input>
               </b-field>
-              <p>{{errors[0]}}</p>
+              <p style="color: red">{{errors[0]}}</p>
             </validation-provider>
 
             <b-field label="Project Description">
@@ -67,16 +68,12 @@
               :data="localStateSelectedContainer.projects"
               :loading="loading"
             >
-              <b-table-column field="_id" label="id" sortable v-slot="props">
-                {{ props.row._id }}
+              <b-table-column field="id" label="id" sortable v-slot="props">
+                {{ props.row.id }}
               </b-table-column>
 
               <b-table-column field="name" label="Name" sortable v-slot="props">
                 {{ props.row.name }}
-              </b-table-column>
-
-              <b-table-column field="slug" label="Slug" sortable v-slot="props">
-                {{ props.row.slug }}
               </b-table-column>
 
               <b-table-column label="Action" v-slot="props">
@@ -84,14 +81,14 @@
                   type="is-info"
                   size="is-small"
                   icon-left="pencil"
-                  @click="$router.push(`/projects/${props.row.slug}`)"
+                  @click="$router.push(`/projects/${props.row.id}`)"
                 >Edit
                 </b-button>
                 <b-button
                   type="is-danger"
                   size="is-small"
                   icon-left="delete"
-                  @click="confirmRemoveProject(props.row._id)"
+                  @click="confirmRemoveProject(props.row.id)"
                 >
                   Remove
                 </b-button>
@@ -101,7 +98,7 @@
 
           <div class="container">
             <div
-              v-if="$route.params.containerSlug === 'new'"
+              v-if="$route.name === 'containers-create' "
               class="columns is-multiline"
               style="
             text-align: center;
@@ -110,6 +107,7 @@
             align-items: center;
           "
             >
+
               <div class="column is-12">
                 <p class="is-size-3">No router.json provided</p>
                 <p>Please Provide your router in this below editor</p>
@@ -157,10 +155,8 @@
               >
                 <template v-slot:card-content v-if="project.description">
                   <div>
-                    <span class="has-text-weight-semibold"> Project Slug : </span>
-                    <p class="dont-break-out">{{ project.slug }}</p>
                     <span class="has-text-weight-semibold"> Project id : </span>
-                    <p class="dont-break-out">{{ project._id }}</p>
+                    <p class="dont-break-out">{{ project.id }}</p>
                   </div>
                   <b-button @click="addProject(project)"> Add</b-button>
                 </template>
@@ -187,30 +183,20 @@ export default {
   props: {
     propsContainer: Object
   },
-  watch: {
-    // 'propsContainer' : function(val){
-    //   console.log("propsContainer is");
-    //   console.log(val);
-    //    this.localStateSelectedContainer = JSON.parse(JSON.stringify(val));
-    //   console.log(this.localStateSelectedContainer);
-    //  },
-
-  },
   data() {
     return {
       isRightBarOpen: false,
       isFetchingRelatedProject: false,
       relatedProjects: [],
       localStateSelectedContainer: {
-        slug: null,
         name: null,
         projects: [],
         description: null,
         routers: [
           {
             path: "",
-            project_directory: "",
             method: "",
+            type : ""
           },
         ],
       },
@@ -221,21 +207,35 @@ export default {
   },
   methods: {
     ...mapActions({
-
-
       fetchRelatedProjects: "projects/fetchProjects",
     }),
     ...mapMutations({
       setSelectedContainer: "containers/setSelectedContainer",
     }),
     onSaveClicked() {
+      //validate method and path, make sure all filled
 
-      this.$emit('on-save', this.localStateSelectedContainer)
+      let isRoutersValidated = true
+      for(let i = 0; i < this.localStateSelectedContainer.routers.length; i++){
+        let routes = this.localStateSelectedContainer.routers[i]
+        if(!routes.path || routes.path.trim().length === 0 || !routes.method || routes.method.trim().length === 0 || !routes.type || routes.type.trim().length === 0){
+           isRoutersValidated = false
+          break;
+        }
+      }
+
+      if(isRoutersValidated){
+        this.$emit('on-save', this.localStateSelectedContainer)
+      }else{
+
+        showToast('Please fill all method and routes', 'is-danger','is-bottom')
+      }
+
     },
     addProject(project) {
       let isAlreadyAdded = false;
       this.localStateSelectedContainer.projects.forEach((e) => {
-        if (e._id === project._id) {
+        if (e.id === project.id) {
           isAlreadyAdded = true;
         }
       });
@@ -248,6 +248,7 @@ export default {
 
     onChangeCode(val) {
       this.localStateSelectedContainer.routers = val;
+
     },
 
     async openRightBar() {
@@ -278,7 +279,7 @@ export default {
     async removeProject(projectId) {
       this.loading = true;
       let temp = this.localStateSelectedContainer.projects.filter(
-        (e) => e._id !== projectId
+        (e) => e.id !== projectId
       );
       this.localStateSelectedContainer.projects = [...temp];
       this.loading = false;
@@ -286,20 +287,15 @@ export default {
   },
 
   async created() {
-    // const { containerSlug } = this.$route.params;
-    // if (containerSlug !== "new") {
-    //   await this.loadAsyncData();
-    // }
+
     if (this.propsContainer) {
       this.localStateSelectedContainer = JSON.parse(JSON.stringify(this.propsContainer));
-      console.log("lcoal state selected container is");
-      console.log(this.localStateSelectedContainer);
+
 
     }
   },
   beforeRouteLeave(to, from, next) {
-    console.log("to is");
-    console.log(to);
+
     this.$buefy.dialog.confirm({
       title: "Leaving Page",
       message:

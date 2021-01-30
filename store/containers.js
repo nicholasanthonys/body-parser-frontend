@@ -33,9 +33,9 @@ export const actions = {
         }).catch(error => reject(error));
     }))
   },
-  async fetchContainerBySlug(context,containerSlug) {
+  async fetchContainerById(context,id) {
     return new Promise(((resolve, reject) => {
-      this.$axios.get(`/container/${containerSlug}`)
+      this.$axios.get(`/container/${id}`)
         .then(response => {
           if (response.status === 200) {
             context.commit("setSelectedContainer", response.data.container)
@@ -44,7 +44,7 @@ export const actions = {
         }).catch(error => reject(error));
     }))
   },
-  async  updateContainerBySlug(context,data){
+  async  updateContainer(context,data){
     return new Promise(((resolve, reject) => {
       this.$axios.put(`/container`, data)
         .then(response => {
@@ -77,6 +77,6 @@ export const mutations = {
     state.selectedContainer = data;
   },
   deleteContainerById(state,id){
-    state.containers = [...state.containers.filter(container => container._id !== id)]
+    state.containers = [...state.containers.filter(container => container.id !== id)]
   }
 }

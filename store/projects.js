@@ -24,7 +24,7 @@ export const actions = {
         }).catch(error => reject(error));
     }))
   },
-  updateProjectBySlug(context, data) {
+  updateProject(context, data) {
     return new Promise(((resolve, reject) => {
       this.$axios.put('/project', data)
         .then(response => {
@@ -49,9 +49,9 @@ export const actions = {
     }))
   },
   // Get project detail
-  async fetchProjectBySlug(context, projectSlug) {
+  async fetchProjectById(context, id) {
     return new Promise(((resolve, reject) => {
-      this.$axios.get(`/project/${projectSlug}`)
+      this.$axios.get(`/project/${id}`)
         .then(response => {
           if (response.status === 200) {
             const {project} = response.data
@@ -64,23 +64,23 @@ export const actions = {
   },
 
   // Delete project detail
-  async deleteProjectBySlug(context, projectSlug) {
+  async deleteProjectById(context, id) {
     return new Promise(((resolve, reject) => {
-      this.$axios.delete(`/project/${projectSlug}`)
+      this.$axios.delete(`/project/${id}`)
         .then(response => {
 
-          context.commit("removeProjectBySlug", projectSlug)
+          context.commit("removeProjectById", id)
 
           resolve(response)
         }).catch(error => reject(error));
     }))
   },
   async deleteSpecificConfigure(context, data) {
-    const {projectSlug, configureId} = data;
+    const {projectId, configureId} = data;
     return new Promise(((resolve, reject) => {
       this.$axios.delete(`/configure`, {
         params: {
-          projectSlug,
+          projectId,
           configureId
         }
       })
@@ -104,11 +104,11 @@ export const mutations = {
   setSelectedProject(state, data) {
     state.selectedProject = data;
   },
-  removeProjectBySlug(state, slug) {
-    state.projects = [...state.projects.filter(element => element.slug !== slug)]
+  removeProjectById(state, id) {
+    state.projects = [...state.projects.filter(element => element.id !== id)]
   },
   removeSpecificConfigure(state, configureId) {
-    state.selectedProject.configures = [...state.selectedProject.configures.filter(element => element._id !== configureId)];
+    state.selectedProject.configures = [...state.selectedProject.configures.filter(element => element.id !== configureId)];
   }
 
 

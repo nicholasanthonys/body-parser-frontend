@@ -8,7 +8,7 @@
     <div v-else>
       <div class="columns is-multiline">
         <div class="column is-12">
-          <p class="is-size-1 has-text-weight-bold"> Your Containers</p>
+          <p class="is-size-1 has-text-weight-bold"> Your Configuration Containers</p>
         </div>
         <div class="column is-12">
           <b-button type="is-primary has-text-weight-bold" @click="$router.push('/containers/create')" >Add New Container
@@ -22,7 +22,7 @@
         :gutter="{default: '30px', 700: '15px'}"
 
       >
-        <div v-for="container in containers" :key="container._id" style="padding: 10px">
+        <div v-for="container in containers" :key="container.id" style="padding: 10px">
           <card
             :title="container.name"
             icon="cube"
@@ -30,8 +30,12 @@
           >
             <template v-slot:card-content v-if="container.description">
               <div>
-                <span class="has-text-weight-semibold"> Container Slug : </span>
-                <p class="dont-break-out">{{ container.slug }} </p>
+                <span class="has-text-weight-semibold"> Container Configuration Id : </span>
+                <p class="dont-break-out">{{ container.id }} </p>
+                <span class="has-text-weight-semibold"> Container created  : </span>
+                <p class="dont-break-out">{{ container.isCreated ? 'Created' : 'Not Created' }} </p>
+                <span class="has-text-weight-semibold"> Docker Container Id : </span>
+                <p class="dont-break-out">{{ container.containerId ? container.containerId : '-' }} </p>
 
                 <span class="has-text-weight-semibold">Container Status : </span>
                 <p class="has-text-weight-normal dont-break-out" :style="{
@@ -47,7 +51,7 @@
               No container description provided
             </template>
             <template v-slot:card-footer-content>
-              <nuxt-link :to="`/containers/edit/${container.slug}`" class="card-footer-item">
+              <nuxt-link :to="`/containers/edit/${container.id}`" class="card-footer-item">
                 <b-icon
                   icon="pencil"
                   size="is-small"
@@ -98,12 +102,12 @@ export default {
     }),
     async confirmDeleteContainer(container){
       this.$buefy.dialog.confirm({
-        title: `Deleting container ${container.slug}`,
+        title: `Deleting container ${container.id}`,
         message: 'Are you sure you want to <b>delete</b> this container ?',
         confirmText: 'Delete Container',
         type: 'is-danger',
         hasIcon: true,
-        onConfirm: async () => await this.deleteContainer(container._id),
+        onConfirm: async () => await this.deleteContainer(container.id),
 
       })
     },
@@ -121,8 +125,7 @@ export default {
       this.isLoading = true;
       try {
         await this.fetchContainers();
-        console.log("containers is");
-        console.log(this.containers)
+
       }catch (err) {
         showToast(err.response.data.message, 'is-danger','is-bottom')
       }

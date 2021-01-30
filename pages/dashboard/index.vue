@@ -20,7 +20,7 @@
         :gutter="{default: '30px', 700: '15px'}"
 
       >
-        <div v-for="project in projects" :key="project._id" style="padding: 10px">
+        <div v-for="project in projects" :key="project.id" style="padding: 10px">
           <card
             :title="project.name"
             icon="folder"
@@ -30,8 +30,8 @@
 
 
               <div>
-                <span class="has-text-weight-semibold"> Project Slug : </span>
-                <p class="dont-break-out">{{ project.slug }} </p>
+                <span class="has-text-weight-semibold"> Project Id : </span>
+                <p class="dont-break-out">{{ project.id }} </p>
                 <span class="has-text-weight-semibold">Project Description : </span>
                 <p class="has-text-weight-normal dont-break-out">{{ project.description }}</p>
               </div>
@@ -42,7 +42,7 @@
               No project description provided
             </template>
             <template v-slot:card-footer-content>
-              <nuxt-link :to="`/projects/${project.slug}`" class="card-footer-item">
+              <nuxt-link :to="`/projects/${project.id}`" class="card-footer-item">
 
                 <b-icon
 
@@ -51,7 +51,7 @@
                 >
                 </b-icon>
               </nuxt-link>
-              <a @click="deleteProject(project.slug)" class="card-footer-item">
+              <a @click="deleteProject(project.id)" class="card-footer-item">
 
                 <b-icon
 
@@ -124,16 +124,16 @@ export default {
   methods: {
     ...mapActions({
       getProjects: "projects/fetchProjects",
-      deleteProjectBySlug: 'projects/deleteProjectBySlug'
+      deleteProjectById: 'projects/deleteProjectById'
     }),
-    deleteProject(slug) {
+    deleteProject(id) {
       this.$buefy.dialog.confirm({
-        title: `Deleting project ${slug}`,
+        title: `Deleting project ${id}`,
         message: 'Are you sure you want to <b>delete</b> this project This action cannot be undone.',
         confirmText: 'Delete Project',
         type: 'is-danger',
         hasIcon: true,
-        onConfirm: async () => await this.deleteProjectBySlug(slug),
+        onConfirm: async () => await this.deleteProjectById(id),
 
       })
     },
