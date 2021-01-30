@@ -10,6 +10,7 @@ import { mapActions, mapGetters, mapMutations } from "vuex";
 import {showToast} from "@/services/utils";
 
 export default {
+  layout : 'nav',
   components: {
     FormAddEditContainer,
   },

@@ -12,6 +12,7 @@ import FormAddEditContainer from '@/components/FormAddEditContainer';
 import {mapActions} from "vuex";
 import {showToast} from "@/services/utils";
 export default {
+  layout : 'nav',
   components : {
     FormAddEditContainer
 
