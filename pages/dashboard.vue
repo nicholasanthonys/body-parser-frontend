@@ -51,11 +51,5 @@ export default {
       ]
     }
   },
-  methods : {
-   async logOut(){
-
-      await this.$auth.logout()
-    }
-  }
 }
 </script>
