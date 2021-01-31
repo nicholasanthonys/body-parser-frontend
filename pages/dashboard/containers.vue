@@ -11,7 +11,7 @@
           <p class="is-size-1 has-text-weight-bold"> Your Configuration Containers</p>
         </div>
         <div class="column is-12">
-          <b-button type="is-primary has-text-weight-bold" @click="$router.push('/containers/create')" >Add New Container
+          <b-button type="is-primary has-text-weight-bold" @click="$router.push('/containers/create')">Add New Container
           </b-button>
         </div>
       </div>
@@ -33,7 +33,7 @@
                 <span class="has-text-weight-semibold"> Container Configuration Id : </span>
                 <p class="dont-break-out">{{ container.id }} </p>
                 <span class="has-text-weight-semibold"> Container created  : </span>
-                <p class="dont-break-out">{{ container.isCreated ? 'Created' : 'Not Created' }} </p>
+                <p class="dont-break-out">{{ container.isContainerCreated ? 'Created' : 'Not Created' }} </p>
                 <span class="has-text-weight-semibold"> Docker Container Id : </span>
                 <p class="dont-break-out">{{ container.containerId ? container.containerId : '-' }} </p>
 
@@ -58,7 +58,7 @@
                 >
                 </b-icon>
               </nuxt-link>
-              <a  class="card-footer-item">
+              <a class="card-footer-item">
 
                 <b-icon
                   icon="delete"
@@ -66,6 +66,17 @@
                   @click.native="confirmDeleteContainer(container)"
                 >
                 </b-icon>
+              </a>
+              <a class="card-footer-item">
+                <b-icon
+                  v-if="!isTogglingStatus"
+                  :icon=" container.status === 'running' ? 'pause' : 'play'"
+                  size="is-small"
+                  @click.native="toggleStatus(container)"
+                >
+                </b-icon>
+                <b-loading :is-full-page="false" :active="isTogglingStatus" v-else></b-loading>
+
               </a>
             </template>
           </card>
@@ -80,27 +91,42 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import {showToast} from "@/services/utils";
 
 export default {
-  computed : {
+  computed: {
     ...mapGetters({
       containers: 'containers/getContainers'
     })
   },
-  data(){
+  data() {
     return {
-      isLoading : false,
+      isLoading: false,
       isFullPageLoading: false,
+      isTogglingStatus: false,
     }
   },
-  methods : {
+  methods: {
     ...mapActions({
-      fetchContainers : 'containers/fetchContainers',
-      deleteContainerById : 'containers/deleteContainer'
+      fetchContainers: 'containers/fetchContainers',
+      deleteContainerById: 'containers/deleteContainer',
+      toggleStatusContainer: 'containers/toggleStatusContainer',
     }),
-    async confirmDeleteContainer(container){
+    ...mapMutations({
+      updateSpecificContainer: 'containers/updateSpecificContainer'
+    }),
+    async toggleStatus(data) {
+      this.isTogglingStatus = true;
+      try {
+        await this.toggleStatusContainer(data)
+        this.updateSpecificContainer(data);
+      } catch (err) {
+        showToast(err.response.data.message, 'is-danger', 'is-bottom');
+      }
+      this.isTogglingStatus = false;
+    },
+    async confirmDeleteContainer(container) {
       this.$buefy.dialog.confirm({
         title: `Deleting container ${container.id}`,
         message: 'Are you sure you want to <b>delete</b> this container ?',
@@ -111,23 +137,23 @@ export default {
 
       })
     },
-    async deleteContainer(id){
+    async deleteContainer(id) {
       this.isLoading = true;
       try {
         await this.deleteContainerById(id);
         showToast('Delete Success', 'is-success', 'is-bottom');
-      }catch (err) {
-        showToast(err.response.data.message, 'is-danger','is-bottom')
+      } catch (err) {
+        showToast(err.response.data.message, 'is-danger', 'is-bottom')
       }
       this.isLoading = false;
     },
-    async loadContainers(){
+    async loadContainers() {
       this.isLoading = true;
       try {
         await this.fetchContainers();
 
-      }catch (err) {
-        showToast(err.response.data.message, 'is-danger','is-bottom')
+      } catch (err) {
+        showToast(err.response.data.message, 'is-danger', 'is-bottom')
       }
       this.isLoading = false;
     }
