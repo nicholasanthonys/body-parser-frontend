@@ -4,7 +4,7 @@
       <form @submit.prevent="handleSubmit(onSaveClicked)">
         <div class="columns">
           <div class="column is-10">
-            <p class="is-size-2">Container Detail</p>
+            <p class="is-size-2">Configuration Container</p>
           </div>
           <div class="column is-2" v-if="!loading">
             <div class="buttons">
@@ -26,6 +26,18 @@
                 expanded
                 style="margin: 6px"
               >Add more project
+              </b-button>
+
+
+              <b-button
+                  v-if="$route.name === 'containers-edit-id' "
+                type="is-danger "
+                expanded
+                  :disabled="localStateSelectedContainer.isContainerCreated"
+                style="margin: 6px"
+                  :loading="isCreatingDockerContainer"
+                  @click.native="createContainer()"
+              > {{localStateSelectedContainer.isContainerCreated ? 'Docker Container Created': 'Create Docker Container'}}
               </b-button
               >
             </div>
@@ -183,11 +195,19 @@ export default {
   props: {
     propsContainer: Object
   },
+  watch : {
+    propsContainer(val){
+      if (val) {
+        this.localStateSelectedContainer = JSON.parse(JSON.stringify(val));
+      }
+    }
+  },
   data() {
     return {
       isRightBarOpen: false,
       isFetchingRelatedProject: false,
       relatedProjects: [],
+      isCreatingDockerContainer : false,
       localStateSelectedContainer: {
         name: null,
         projects: [],
@@ -208,10 +228,24 @@ export default {
   methods: {
     ...mapActions({
       fetchRelatedProjects: "projects/fetchProjects",
+      createDockerContainer : 'containers/createDockerContainer'
     }),
     ...mapMutations({
       setSelectedContainer: "containers/setSelectedContainer",
     }),
+
+    async createContainer(){
+      this.isCreatingDockerContainer = true;
+      try{
+        const {id} = this.localStateSelectedContainer;
+        await this.createDockerContainer(id);
+        this.localStateSelectedContainer.isContainerCreated = true;
+
+      }catch (err) {
+        showToast(err.response.data.message, 'is-danger', 'is-bottom')
+      }
+      this.isCreatingDockerContainer = false;
+    },
     onSaveClicked() {
       //validate method and path, make sure all filled
 
@@ -250,7 +284,6 @@ export default {
       this.localStateSelectedContainer.routers = val;
 
     },
-
     async openRightBar() {
       this.isFetchingRelatedProject = true;
       try {
@@ -262,8 +295,6 @@ export default {
       }
       this.isFetchingRelatedProject = false;
     },
-
-
     confirmRemoveProject(projectId) {
       this.$buefy.dialog.confirm({
         title: "Remove Project from container",
@@ -290,8 +321,6 @@ export default {
 
     if (this.propsContainer) {
       this.localStateSelectedContainer = JSON.parse(JSON.stringify(this.propsContainer));
-
-
     }
   },
   beforeRouteLeave(to, from, next) {
