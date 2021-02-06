@@ -19,9 +19,6 @@
             </nuxt-link>
           </li>
         </ul>
-        <ul>
-          <b-button @click="logOut">Log out</b-button>
-        </ul>
       </aside>
 
       <div class="container column is-10">
