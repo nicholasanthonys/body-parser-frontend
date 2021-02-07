@@ -33,15 +33,10 @@
                 <span class="has-text-weight-semibold"> Container Configuration Id : </span>
                 <p class="dont-break-out">{{ container.id }} </p>
                 <span class="has-text-weight-semibold"> Container created  : </span>
-                <p class="dont-break-out">{{ container.isContainerCreated ? 'Created' : 'Not Created' }} </p>
+                <p class="dont-break-out">{{ container.containerId? 'Created' : 'Not Created' }} </p>
                 <span class="has-text-weight-semibold"> Docker Container Id : </span>
                 <p class="dont-break-out">{{ container.containerId ? container.containerId : '-' }} </p>
 
-                <span class="has-text-weight-semibold">Container Status : </span>
-                <p class="has-text-weight-normal dont-break-out" :style="{
-                  color :
-                  container.status==='running' ? 'green' : 'red'
-                }">{{ container.status }}</p>
 
                 <span class="has-text-weight-semibold">Container Description : </span>
                 <p class="has-text-weight-normal dont-break-out">{{ container.description }}</p>
@@ -67,17 +62,7 @@
                 >
                 </b-icon>
               </a>
-              <a class="card-footer-item">
-                <b-icon
-                  v-if="!isTogglingStatus"
-                  :icon=" container.status === 'running' ? 'pause' : 'play'"
-                  size="is-small"
-                  @click.native="toggleStatus(container)"
-                >
-                </b-icon>
-                <b-loading :is-full-page="false" :active="isTogglingStatus" v-else></b-loading>
 
-              </a>
             </template>
           </card>
         </div>
@@ -104,28 +89,17 @@ export default {
     return {
       isLoading: false,
       isFullPageLoading: false,
-      isTogglingStatus: false,
     }
   },
   methods: {
     ...mapActions({
       fetchContainers: 'containers/fetchContainers',
       deleteContainerById: 'containers/deleteContainer',
-      toggleStatusContainer: 'containers/toggleStatusContainer',
     }),
     ...mapMutations({
       updateSpecificContainer: 'containers/updateSpecificContainer'
     }),
-    async toggleStatus(data) {
-      this.isTogglingStatus = true;
-      try {
-        await this.toggleStatusContainer(data)
-        this.updateSpecificContainer(data);
-      } catch (err) {
-        showToast(err.response.data.message, 'is-danger', 'is-bottom');
-      }
-      this.isTogglingStatus = false;
-    },
+
     async confirmDeleteContainer(container) {
       this.$buefy.dialog.confirm({
         title: `Deleting container ${container.id}`,

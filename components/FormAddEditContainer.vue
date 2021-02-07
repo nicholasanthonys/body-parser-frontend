@@ -2,11 +2,28 @@
   <section class="section">
     <validation-observer ref="observer" v-slot="{handleSubmit}">
       <form @submit.prevent="handleSubmit(onSaveClicked)">
-        <div class="columns">
-          <div class="column is-10">
+        <div class="columns is-multiline">
+          <div class="column is-8">
             <p class="is-size-2">Configuration Container</p>
+            <p v-if="localStateSelectedContainer.containerId" class="is-size-5"> Status Docker Container:
+              <span :style="{
+              color : localStateSelectedContainer.running ? 'green' : 'red'
+            }"> {{ localStateSelectedContainer.running ? 'RUNNING' : 'STOPPED' }}</span></p>
+
+
+            <b-icon
+              v-if="!isTogglingStatus"
+              :icon=" localStateSelectedContainer.running  ? 'pause' : 'play'"
+              size="is-large"
+              @click.native="toggleStatus(localStateSelectedContainer)"
+              :type="localStateSelectedContainer.running  ? 'is-danger' : 'is-success'"
+            >
+            </b-icon>
+            <b-loading :is-full-page="false" :active="isTogglingStatus" v-else></b-loading>
+
+
           </div>
-          <div class="column is-2" v-if="!loading">
+          <div class="column " v-if="!loading">
             <div class="buttons">
               <b-button
                 type="is-success"
@@ -30,14 +47,13 @@
 
 
               <b-button
-                  v-if="$route.name === 'containers-edit-id' "
+                v-if="$route.name === 'containers-edit-id' "
                 type="is-danger "
                 expanded
-                  :disabled="localStateSelectedContainer.isContainerCreated"
                 style="margin: 6px"
-                  :loading="isCreatingDockerContainer"
-                  @click.native="createContainer()"
-              > {{localStateSelectedContainer.isContainerCreated ? 'Docker Container Created': 'Create Docker Container'}}
+                :loading="isCreatingDockerContainer"
+                @click.native="createContainer()"
+              > {{ localStateSelectedContainer.containerId ? 'ReCreate Docker Container' : 'Create Docker Container' }}
               </b-button
               >
             </div>
@@ -56,12 +72,16 @@
           </div>
         </div>
         <div class="container" v-else>
+          <p class="label">Configuration Container Id</p>
+          <p>{{localStateSelectedContainer.id}}</p>
+          <p class="label">Docker Container Id</p>
+          <p>{{ localStateSelectedContainer.containerId ? localStateSelectedContainer.containerId : '-' }}</p>
           <div v-if="localStateSelectedContainer != null">
             <validation-provider v-slot="{ errors }" rules="required">
               <b-field label="Container Name">
                 <b-input v-model="localStateSelectedContainer.name"></b-input>
               </b-field>
-              <p style="color: red">{{errors[0]}}</p>
+              <p style="color: red">{{ errors[0] }}</p>
             </validation-provider>
 
             <b-field label="Project Description">
@@ -195,8 +215,8 @@ export default {
   props: {
     propsContainer: Object
   },
-  watch : {
-    propsContainer(val){
+  watch: {
+    propsContainer(val) {
       if (val) {
         this.localStateSelectedContainer = JSON.parse(JSON.stringify(val));
       }
@@ -204,10 +224,12 @@ export default {
   },
   data() {
     return {
+
+      isTogglingStatus: false,
       isRightBarOpen: false,
       isFetchingRelatedProject: false,
       relatedProjects: [],
-      isCreatingDockerContainer : false,
+      isCreatingDockerContainer: false,
       localStateSelectedContainer: {
         name: null,
         projects: [],
@@ -216,7 +238,8 @@ export default {
           {
             path: "",
             method: "",
-            type : ""
+            type: "",
+            project_id: ""
           },
         ],
       },
@@ -228,41 +251,62 @@ export default {
   methods: {
     ...mapActions({
       fetchRelatedProjects: "projects/fetchProjects",
-      createDockerContainer : 'containers/createDockerContainer'
+      createDockerContainer: 'containers/createDockerContainer',
+      toggleStatusContainer: 'containers/toggleStatusContainer',
     }),
     ...mapMutations({
       setSelectedContainer: "containers/setSelectedContainer",
     }),
 
-    async createContainer(){
-      this.isCreatingDockerContainer = true;
-      try{
-        const {id} = this.localStateSelectedContainer;
-        await this.createDockerContainer(id);
-        this.localStateSelectedContainer.isContainerCreated = true;
-
-      }catch (err) {
-        showToast(err.response.data.message, 'is-danger', 'is-bottom')
+    async toggleStatus(data) {
+      this.isTogglingStatus = true;
+      try {
+        await this.toggleStatusContainer(data)
+        this.localStateSelectedContainer.running = !this.localStateSelectedContainer.running
+      } catch (err) {
+        showToast(err.response.data.message, 'is-danger', 'is-bottom');
       }
-      this.isCreatingDockerContainer = false;
+      this.isTogglingStatus = false;
+    },
+    async createContainer() {
+      if (!this.localStateSelectedContainer.running) {
+        this.isCreatingDockerContainer = true;
+        try {
+          const {id} = this.localStateSelectedContainer;
+          let response = await this.createDockerContainer(id);
+          this.localStateSelectedContainer.containerId = response.data.containerId;
+          showToast('Docker container created', 'is-success', 'is-bottom')
+        } catch (err) {
+          showToast(err.response.data.message, 'is-danger', 'is-bottom')
+        }
+        this.isCreatingDockerContainer = false;
+      } else {
+        this.$buefy.dialog.alert({
+          title: 'Container is running',
+          message: 'Please <b>Stop</b> your container first !',
+          confirmText: 'OK',
+          type: 'is-danger',
+        })
+      }
+
     },
     onSaveClicked() {
       //validate method and path, make sure all filled
 
       let isRoutersValidated = true
-      for(let i = 0; i < this.localStateSelectedContainer.routers.length; i++){
+      for (let i = 0; i < this.localStateSelectedContainer.routers.length; i++) {
         let routes = this.localStateSelectedContainer.routers[i]
-        if(!routes.path || routes.path.trim().length === 0 || !routes.method || routes.method.trim().length === 0 || !routes.type || routes.type.trim().length === 0){
-           isRoutersValidated = false
+        if (!routes.path || routes.path.trim().length === 0 || !routes.method || routes.method.trim().length === 0 || !routes.type || routes.type.trim().length === 0) {
+          isRoutersValidated = false
           break;
         }
       }
 
-      if(isRoutersValidated){
+      if (isRoutersValidated) {
         this.$emit('on-save', this.localStateSelectedContainer)
-      }else{
+      } else {
 
-        showToast('Please fill all method and routes', 'is-danger','is-bottom')
+        showToast('Please fill all method and routes', 'is-danger', 'is-bottom')
       }
 
     },
