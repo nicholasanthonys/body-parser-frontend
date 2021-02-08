@@ -12,7 +12,7 @@
 
 
             <b-icon
-              v-if="!isTogglingStatus"
+              v-if="!isTogglingStatus && localStateSelectedContainer.containerId != null"
               :icon=" localStateSelectedContainer.running  ? 'pause' : 'play'"
               size="is-large"
               @click.native="toggleStatus(localStateSelectedContainer)"
@@ -30,7 +30,7 @@
                 icon-left="plus"
                 expanded
                 native-type="submit"
-
+                :loading="isUpdating"
                 style="margin: 6px"
               >
                 Save
@@ -72,7 +72,7 @@
           </div>
         </div>
         <div class="container" v-else>
-          <p class="label">Configuration Container Id</p>
+          <p class="label" v-if="localStateSelectedContainer.id">Configuration Container Id</p>
           <p>{{localStateSelectedContainer.id}}</p>
           <p class="label">Docker Container Id</p>
           <p>{{ localStateSelectedContainer.containerId ? localStateSelectedContainer.containerId : '-' }}</p>
@@ -203,7 +203,7 @@
 
 <script>
 import {showToast} from "@/services/utils";
-import {mapActions, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import FormEditProject from "@/components/FormEditProject";
 import draggable from "vuedraggable";
 import Editor from "@/components/Editor";
@@ -214,6 +214,11 @@ export default {
   layout: "nav",
   props: {
     propsContainer: Object
+  },
+  computed : {
+   ...mapGetters({
+     isUpdating: 'containers/getIsUpdating'
+   }),
   },
   watch: {
     propsContainer(val) {
@@ -295,8 +300,8 @@ export default {
 
       let isRoutersValidated = true
       for (let i = 0; i < this.localStateSelectedContainer.routers.length; i++) {
-        let routes = this.localStateSelectedContainer.routers[i]
-        if (!routes.path || routes.path.trim().length === 0 || !routes.method || routes.method.trim().length === 0 || !routes.type || routes.type.trim().length === 0) {
+        let route = this.localStateSelectedContainer.routers[i]
+        if (!route.path || route.path.trim().length === 0 || !route.method || route.method.trim().length === 0 || !route.type || route.type.trim().length === 0) {
           isRoutersValidated = false
           break;
         }

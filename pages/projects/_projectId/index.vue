@@ -161,7 +161,7 @@ export default {
             body: {}
           },
           modifies: {
-            header: [],
+            header: {},
             body: {}
           },
           deletes: {
@@ -210,7 +210,7 @@ export default {
 
 
       } catch (err) {
-        showToast(err.response, 'is-danger', 'is-bottom');
+        showToast(err.response.data.message, 'is-danger', 'is-bottom');
       }
       this.loading = false;
     },

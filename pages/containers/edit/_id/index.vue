@@ -41,8 +41,6 @@ export default {
 
     }),
   async update(updatedContainer){
-    this.loading = true;
-
     try {
 
       //* Get array of projectIds
@@ -60,16 +58,22 @@ export default {
       }
       updatedContainer.routers = routers;
 
-      let response = await this.updateContainer(updatedContainer);
-      const {container} = response.data;
-      this.selectedContainer = container;
+     await this.updateContainer({
+        id : updatedContainer.id,
+        name : updatedContainer.name,
+        containerId : updatedContainer.containerid,
+        description : updatedContainer.description,
+        projectIds : updatedContainer.projectIds,
+        routers : updatedContainer.routers
+      });
+      // const {container} = response.data;
+      // this.selectedContainer = container;
 
       showToast('Update success', 'is-success', 'is-bottom');
 
     } catch (err) {
       showToast(err.response.data.message, "is-danger", "is-bottom");
     }
-    this.loading = false;
   },
      async loadContainerDetail() {
       this.loading = true;
