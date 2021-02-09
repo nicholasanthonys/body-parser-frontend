@@ -145,8 +145,8 @@ export default {
     async updateConfigure() {
       const {projectId, configureId} = this.$route.params;
       try {
-        let response = await this.$axios.put(`/configure?projectId=${projectId}&configureId=${configureId}`, {
-
+        let response = await this.$axios.put(`/configure?configureId=${configureId}`, {
+          projectId ,
           description : this.configure.description,
           config: this.configure.config
         });

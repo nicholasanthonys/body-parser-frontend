@@ -34,7 +34,14 @@ export default {
         newContainer.projectIds = projectIds;
 
 
-        await this.storeContainer(newContainer);
+        await this.storeContainer({
+
+          name : newContainer.name,
+          description :newContainer.description,
+          projectIds : newContainer.projectIds,
+          routers : newContainer.routers
+
+        });
         this.$router.push({name : 'dashboard-containers'})
         showToast("Saved", "is-success", "is-bottom");
 
