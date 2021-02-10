@@ -151,7 +151,8 @@ export default {
           config: this.configure.config
         });
         this.setSelectedProject(response.data)
-        this.$router.go(-1)
+
+        showToast('Update success', 'is-success', 'is-bottom');
       } catch (err) {
         showToast(err.response.data.message, 'is-danger', 'is-top')
       }
